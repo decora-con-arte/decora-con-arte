@@ -8,8 +8,14 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="mx-auto min-h-screen w-full md:max-w-md bg-brand-bg flex flex-col relative md:shadow-2xl md:border-x md:border-gray-200">
       
-      {/* Header Fijo con vida */}
       <header className="sticky top-0 z-50 bg-brand-bg/95 backdrop-blur-md p-4 border-b border-gray-100 flex items-center justify-between shadow-sm">
+        <div className="flex justify-center">
+            <img 
+            src="/logo.png" 
+            alt="Don Melona Logo" 
+            className="h-15 w-auto object-contain"
+            />
+        </div>
         <div className="flex items-center gap-2">
           <div className="leading-tight">
             <h1 className="text-xl font-black tracking-tight text-brand-primary uppercase">
@@ -27,7 +33,6 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
 
-      {/* Nav Amarillo con sombras profundas */}
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full md:max-w-md bg-brand-nav h-16 flex items-center justify-around z-50 shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.15)] border-t border-brand-nav/80">
         <button className="flex-1 flex flex-col items-center justify-center text-brand-text font-black text-xs gap-1 h-full">
           <span className="text-2xl drop-shadow-sm">🍔</span>

@@ -1,7 +1,7 @@
 import Papa from 'papaparse';
 import type { Product } from '../types/product';
 
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQrftq4ZTAwMAyBUNRHCyUrfx_kq8AasEMsbpAv8-vATGzxYzd-gjlD3dJCMiYO6208b9WJAhKf8vLP/pub?output=csv';
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSf-ehQbxC87zfQkwQlhQ_SXiMzFiKmxZ3amTS1zV6oPJiP2GPhSh3g8zUXtsgqiW9fkkpoFmFC6zCo/pub?output=csv';
 
 export async function fetchProducts(): Promise<Product[]> {
     try {
