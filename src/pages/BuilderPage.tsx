@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus, Check, ChevronDown } from 'lucide-react';
 import { fetchIngredients } from '../services/googleSheets';
 import type { Ingredient } from '../types/product';
+import { useCart } from '../context/CartContext';
 import { Toast } from '../components/Toast';
+
 
 const FREE_LIMITS = {
     PROTEIN: 1,
@@ -27,6 +29,8 @@ export function BuilderPage() {
     const [selectedSauces, setSelectedSauces] = useState<string[]>([]);
 
     const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+    const { addToCart } = useCart();
 
     useEffect(() => {
         async function load() {
@@ -106,6 +110,33 @@ export function BuilderPage() {
     };
 
     const handleAddToCart = () => {
+
+        const getName = (id: string) => ingredients.find(i => i.id === id)?.name || '';
+        const getNames = (ids: string[]) => ids.map(getName).join(', ');
+
+        const baseName = selectedBase ? getName(selectedBase) : '';
+        const proteins = getNames(selectedProteins);
+        const toppings = getNames(selectedToppings);
+        const sauces = getNames(selectedSauces);
+
+        const descriptionParts = [];
+        if (baseName) descriptionParts.push(`- Base: ${baseName}`);
+        if (proteins) descriptionParts.push(`- Prot: ${proteins}`);
+        if (toppings) descriptionParts.push(`- Top: ${toppings}`);
+        if (sauces) descriptionParts.push(`- Salsas: ${sauces}`);
+
+        const melonaDescription = descriptionParts.join('\n');
+
+        const uniqueConfigId = `melona-${selectedBase}-${[...selectedProteins].sort().join('-')}-${[...selectedToppings].sort().join('-')}-${[...selectedSauces].sort().join('-')}`;
+
+        addToCart({
+            cartItemId: uniqueConfigId,
+            name: "Melona Personalizada",
+            price: calculateTotal(),
+            quantity: 1,
+            description: melonaDescription,
+            image: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
+        });
 
         setToastMessage("¡Tu Melona personalizada fue añadida!");
 
