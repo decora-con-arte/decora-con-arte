@@ -96,7 +96,7 @@ export function MenuPage() {
     }), [products, activeCategory]);
 
     return (
-        <div className="space-y-6">
+        <div className="page-scroll -m-4 space-y-6 p-4">
 
             <div
                 onClick={() => navigate('/builder')}

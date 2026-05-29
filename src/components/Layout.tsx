@@ -57,11 +57,12 @@ export function Layout({ children }: LayoutProps) {
     </div>
       </header>
 
-      <main className="app-main-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4">
+      <main className="flex flex-1 min-h-0 flex-col overflow-hidden p-4">
         {children}
       </main>
 
-      <nav className="shrink-0 w-full bg-white/90 backdrop-blur-md h-16 flex items-center justify-around z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] border-t border-gray-100">
+      <nav className="app-nav shrink-0 w-full bg-white/90 backdrop-blur-md z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] border-t border-gray-100">
+        <div className="flex h-16 w-full items-center justify-around">
 
         <button 
           onClick={() => navigate('/')}
@@ -108,6 +109,7 @@ export function Layout({ children }: LayoutProps) {
           <span className="text-[11px] tracking-tight">Carrito</span>
         </button>
 
+        </div>
       </nav>
     </div>
   );

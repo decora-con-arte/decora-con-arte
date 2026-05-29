@@ -298,8 +298,8 @@ export function BuilderPage() {
     };
 
     return (
-        <div className="-m-4 flex h-full max-h-full flex-col overflow-hidden">
-            <div className="app-main-scroll flex-1 min-h-0 overflow-y-auto p-4">
+        <div className="page-with-checkout">
+            <div className="page-scroll p-4 pb-2">
             <div className="flex items-center gap-4 mb-6">
                 <button
                     onClick={() => navigate('/')}
@@ -342,14 +342,15 @@ export function BuilderPage() {
             </div>
             </div>
 
-            <div className="shrink-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.08)]">
+            <div className="checkout-bar">
                 <button
+                    type="button"
                     disabled={!selectedBase || selectedProteins.length === 0}
                     onClick={handleAddToCart}
-                    className="w-full bg-brand-primary disabled:bg-gray-300 text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-orange-200 active:scale-[0.98] transition-all"
+                    className="btn-cta btn-cta--split"
                 >
-                    <span className="uppercase tracking-tight text-sm">Agregar al Carrito</span>
-                    <span className="text-xl font-black">${calculateTotal().toLocaleString()}</span>
+                    <span>Agregar al carrito</span>
+                    <span className="btn-cta__price">${calculateTotal().toLocaleString()}</span>
                 </button>
             </div>
 

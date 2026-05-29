@@ -49,17 +49,17 @@ export function CartPage() {
         <p className="text-gray-500 text-sm mb-8 font-medium">Parece que aún no has elegido tu Melona ideal. ¡No dejes que tu barriga sufra!</p>
         <button 
           onClick={() => navigate('/')}
-          className="bg-brand-primary text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-orange-200 active:scale-95 transition-all flex items-center gap-2"
+          className="btn-cta !w-auto px-8 flex items-center gap-2"
         >
-          VER EL MENÚ <ArrowRight size={18} />
+          Ver el menú <ArrowRight size={18} strokeWidth={2.5} />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="-m-4 flex h-full max-h-full flex-col overflow-hidden animate-in fade-in duration-500">
-      <div className="app-main-scroll flex-1 min-h-0 overflow-y-auto p-4">
+    <div className="page-with-checkout animate-in fade-in duration-500">
+      <div className="page-scroll p-4 pb-2">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <button 
@@ -85,20 +85,17 @@ export function CartPage() {
         </div>
       </div>
 
-      <div className="shrink-0 bg-white/95 backdrop-blur-md border-t border-gray-100 p-6 shadow-[0_-10px_30px_rgba(0,0,0,0.08)]">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-gray-400 font-bold text-sm uppercase tracking-widest">Total ({totalItems} items)</span>
-          <span className="text-2xl font-black text-brand-text">${totalPrice.toLocaleString()}</span>
+      <div className="checkout-bar">
+        <div className="checkout-bar__total-row">
+          <span className="checkout-bar__label">Total · {totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
+          <span className="checkout-bar__amount">${totalPrice.toLocaleString()}</span>
         </div>
-        
-        <button 
-          onClick={handleCheckout}
-          className="w-full bg-brand-primary text-white p-4 rounded-2xl font-black flex items-center justify-center gap-3 shadow-lg shadow-orange-200 active:scale-[0.98] transition-all"
-        >
-          <ShoppingCart size={20} />
-          <span className="uppercase tracking-tight">Pedir por WhatsApp</span>
+
+        <button type="button" onClick={handleCheckout} className="btn-cta">
+          <ShoppingCart size={20} strokeWidth={2.5} />
+          <span>Pedir por WhatsApp</span>
         </button>
-        <p className="text-center text-[10px] text-gray-400 font-bold uppercase mt-4 tracking-widest">Atención inmediata • Don Melona</p>
+        <p className="checkout-bar__hint">Atención inmediata · Don Melona</p>
       </div>
     </div>
   );
