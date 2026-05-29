@@ -58,6 +58,13 @@ body {
     0 4px 12px -4px rgba(0, 0, 0, 0.06);
 }
 
+.toast-remove {
+  border-color: color-mix(in srgb, #ef4444 25%, transparent);
+  box-shadow:
+    0 8px 24px -6px color-mix(in srgb, #ef4444 22%, transparent),
+    0 4px 12px -4px rgba(0, 0, 0, 0.06);
+}
+
 /* Barra inferior de checkout (carrito / builder) */
 .checkout-bar {
   flex-shrink: 0;

@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
-import { CheckCircle2, X } from 'lucide-react';
+import { CheckCircle2, Trash2, X } from 'lucide-react';
+
+export type ToastVariant = 'success' | 'remove';
 
 interface ToastProps {
   message: string;
   isVisible: boolean;
   onClose: () => void;
+  variant?: ToastVariant;
 }
 
-export function Toast({ message, isVisible, onClose }: ToastProps) {
+export function Toast({ message, isVisible, onClose, variant = 'success' }: ToastProps) {
+  const isRemove = variant === 'remove';
 
   const [shouldRender, setShouldRender] = useState(isVisible);
   const [animate, setAnimate] = useState(false);
@@ -43,10 +47,14 @@ export function Toast({ message, isVisible, onClose }: ToastProps) {
                     : 'opacity-0 -translate-y-12 scale-95 pointer-events-none'
                   }`}
     >
-      <div className="toast-success bg-white/95 backdrop-blur-md text-brand-text px-4 py-3.5 rounded-2xl flex items-center justify-between gap-3 border border-brand-accent/25">
+      <div className={`${isRemove ? 'toast-remove border-red-200' : 'toast-success border-brand-accent/25'} bg-white/95 backdrop-blur-md text-brand-text px-4 py-3.5 rounded-2xl flex items-center justify-between gap-3 border`}>
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="shrink-0 w-9 h-9 rounded-full bg-brand-accent/15 flex items-center justify-center">
-            <CheckCircle2 size={20} className="text-brand-accent" strokeWidth={2.5} />
+          <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${isRemove ? 'bg-red-50' : 'bg-brand-accent/15'}`}>
+            {isRemove ? (
+              <Trash2 size={18} className="text-red-500" strokeWidth={2.5} />
+            ) : (
+              <CheckCircle2 size={20} className="text-brand-accent" strokeWidth={2.5} />
+            )}
           </div>
           <span className="text-sm font-bold leading-tight truncate">
             {message}
@@ -54,7 +62,7 @@ export function Toast({ message, isVisible, onClose }: ToastProps) {
         </div>
         <button 
           onClick={onClose}
-          className="text-brand-text/35 hover:text-brand-text/60 transition-colors active:scale-90 p-1.5 shrink-0 bg-brand-accent/10 hover:bg-brand-accent/15 rounded-full"
+          className={`text-brand-text/35 hover:text-brand-text/60 transition-colors active:scale-90 p-1.5 shrink-0 rounded-full ${isRemove ? 'bg-red-50 hover:bg-red-100' : 'bg-brand-accent/10 hover:bg-brand-accent/15'}`}
           aria-label="Cerrar notificación"
         >
           <X size={14} strokeWidth={3} />

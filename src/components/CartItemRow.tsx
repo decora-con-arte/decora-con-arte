@@ -1,12 +1,13 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
-import { useCart, type CartItem } from '../context/CartContext'; 
+import type { CartItem } from '../context/CartContext'; 
     
 interface Props {
   item: CartItem;
+  onQuantityChange: (item: CartItem, delta: number) => void;
+  onRemove: (item: CartItem) => void;
 }
 
-export function CartItemRow({ item }: Props) {
-  const { updateQuantity, removeFromCart } = useCart();
+export function CartItemRow({ item, onQuantityChange, onRemove }: Props) {
 
   return (
     <div className="bg-white rounded-2xl p-3 flex gap-3 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-right-4">
@@ -37,14 +38,14 @@ export function CartItemRow({ item }: Props) {
           <div className="flex items-center gap-2 bg-gray-50 rounded-full p-1 border border-gray-100">
             {item.quantity === 1 ? (
               <button 
-                onClick={() => removeFromCart(item.cartItemId)}
+                onClick={() => onRemove(item)}
                 className="w-7 h-7 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-full transition-colors"
               >
                 <Trash2 size={14} />
               </button>
             ) : (
               <button 
-                onClick={() => updateQuantity(item.cartItemId, -1)}
+                onClick={() => onQuantityChange(item, -1)}
                 className="w-7 h-7 flex items-center justify-center text-brand-text hover:bg-white rounded-full transition-all shadow-sm"
               >
                 <Minus size={14} strokeWidth={3} />
@@ -54,7 +55,7 @@ export function CartItemRow({ item }: Props) {
             <span className="text-xs font-black w-4 text-center">{item.quantity}</span>
             
             <button 
-              onClick={() => updateQuantity(item.cartItemId, 1)}
+              onClick={() => onQuantityChange(item, 1)}
               className="w-7 h-7 flex items-center justify-center bg-brand-primary text-white rounded-full transition-all shadow-md active:scale-90"
             >
               <Plus size={14} strokeWidth={3} />
