@@ -28,19 +28,6 @@ export interface SpecialMeal {
   endDate: Date | null;
 }
 
-export interface CartItem {
-  cartId: string;
-  product?: Product;
-  melonaConfig?: {
-    base: string;
-    protein: string;
-    toppings: string[];
-    sauces: string[];
-  };
-  quantity: number;
-  totalPrice: number;
-}
-
 export interface StoreSchedule {
   dia: string;
   horaInicio: string;
