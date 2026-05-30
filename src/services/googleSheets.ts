@@ -193,33 +193,34 @@ export async function fetchIngredients(): Promise<Ingredient[]> {
 export async function fetchSchedule(): Promise<StoreSchedule[]> {
   try {
     const response = await fetch(SCHEDULE_CSV_URL);
-    
+
     if (!response.ok) {
       throw new Error("No se pudo conectar con la hoja de horarios");
     }
-    
-    const text = await response.text();
-    
-    const lines = text.split("\n");
-    
-    const dataLines = lines.slice(1);
-    
-    const schedule: StoreSchedule[] = dataLines
-      .map(line => {
-        const columns = line.split(",");
-        
-        if (columns.length < 4 || !columns[0]) return null;
-        
-        return {
-          dia: columns[0].replace(/"/g, "").trim(),
-          horaInicio: columns[1].replace(/"/g, "").trim(),
-          horaFin: columns[2].replace(/"/g, "").trim(),
-          cerrado: columns[3].replace(/"/g, "").trim()
-        };
-      })
-      .filter((item): item is StoreSchedule => item !== null);
 
-    return schedule;
+    const csvText = await response.text();
+
+    return new Promise((resolve, reject) => {
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results: Papa.ParseResult<any>) => {
+          const rawData = results.data as any[];
+
+          const schedule: StoreSchedule[] = rawData
+            .map((data: any) => ({
+              dia: (data.dia || data.Dia || '').trim(),
+              horaInicio: (data.horaInicio || data['Hora Inicio'] || data.HoraInicio || '').trim(),
+              horaFin: (data.horaFin || data['Hora Fin'] || data.HoraFin || '').trim(),
+              cerrado: (data.cerrado || data.Cerrado || '').trim()
+            }))
+            .filter(row => row.dia !== '');
+
+          resolve(schedule);
+        },
+        error: (error: Error) => reject(error)
+      });
+    });
   } catch (error) {
     console.error("Error en fetchSchedule:", error);
     return [];
