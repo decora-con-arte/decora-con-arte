@@ -1,13 +1,15 @@
 import Papa from 'papaparse';
 import type { Product, SpecialMeal, Ingredient, IngredientCategory, StoreSchedule } from '../types/product';
 
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSf-ehQbxC87zfQkwQlhQ_SXiMzFiKmxZ3amTS1zV6oPJiP2GPhSh3g8zUXtsgqiW9fkkpoFmFC6zCo/pub?gid=0&single=true&output=csv';
+const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID ?? '';
 
-const SPECIAL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSf-ehQbxC87zfQkwQlhQ_SXiMzFiKmxZ3amTS1zV6oPJiP2GPhSh3g8zUXtsgqiW9fkkpoFmFC6zCo/pub?gid=1183394839&single=true&output=csv';
+const sheetUrl = (gid: number) =>
+  `https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${gid}&single=true&output=csv`;
 
-const INGREDIENTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSf-ehQbxC87zfQkwQlhQ_SXiMzFiKmxZ3amTS1zV6oPJiP2GPhSh3g8zUXtsgqiW9fkkpoFmFC6zCo/pub?gid=500777&single=true&output=csv';
-
-const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSf-ehQbxC87zfQkwQlhQ_SXiMzFiKmxZ3amTS1zV6oPJiP2GPhSh3g8zUXtsgqiW9fkkpoFmFC6zCo/pub?gid=1757918505&single=true&output=csv';
+const CSV_URL = sheetUrl(0);
+const SPECIAL_CSV_URL = sheetUrl(1183394839);
+const INGREDIENTS_CSV_URL = sheetUrl(500777);
+const SCHEDULE_CSV_URL = sheetUrl(1757918505);
 
 export async function fetchProducts(): Promise<Product[]> {
     try {

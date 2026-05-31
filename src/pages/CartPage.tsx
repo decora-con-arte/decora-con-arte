@@ -37,7 +37,7 @@ export function CartPage() {
   }, [clearCart, notify]);
 
   const handleCheckout = () => {
-    const phone = "573195543774";
+    const phone = import.meta.env.VITE_WHATSAPP_PHONE;
     
     const messageLines = [
       `*¡Hola!* 🍔`,
