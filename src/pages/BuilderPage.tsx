@@ -317,22 +317,22 @@ export function BuilderPage() {
         const nameNormalized = baseName.toLowerCase();
         
         if (nameNormalized.includes('papas') || nameNormalized.includes('papas')) {
-            return "https://tahinis.com/wp-content/uploads/2025/09/Crispy-Fries.png";
+            return "/base-melona/papas.png";
         }
         if (nameNormalized.includes('arepa')) {
-            return "https://epicerietropica.com/wp-content/uploads/2021/02/Arepasgrandex4.png";
+            return "/base-melona/arepa.png";
         }
         if (nameNormalized.includes('perro')) {
-            return "https://img.freepik.com/foto-gratis/perro-caliente-clasico-ketchup-salsa-mostaza-aislado-sobre-fondo-blanco_123827-29686.jpg?semt=ais_hybrid&w=740&q=80"; // Icono de pan perro / hot dog
+            return "/base-melona/perro.png";
         }
         if (nameNormalized.includes('hamburguesa')) {
-            return "https://panamarbakery.com/public/Image/2025/2/14006_maxiburger_sesamo75precort.png";
+            return "/base-melona/hamburguesa.png";
         }
         if (nameNormalized.includes('patacón') || nameNormalized.includes('patacon')) {
-            return "https://delpla.co/wp-content/uploads/2022/03/desembolsado-2.png";
+            return "/base-melona/patacon.png";
         }
 
-        return "https://cdn-icons-png.flaticon.com/512/3075/3075977.png"; 
+        return import.meta.env.VITE_BASE_ICON_FALLBACK;
     };
 
     return (
