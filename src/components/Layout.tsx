@@ -34,26 +34,26 @@ export function Layout({ children }: LayoutProps) {
         </div>
         <div className="flex items-center gap-2">
           <div className="leading-tight">
-            <h1 className="text-xl font-black tracking-tight text-brand-primary uppercase">
-              Don Melona
+            <h1 className="text-xl font-black tracking-tight text-brand-primary uppercase text-center">
+              Sheets Menu SPA
             </h1>
-            <p className="text-[10px] text-brand-text/50 font-bold uppercase tracking-wider">
-              Donde el chef eres tú
+            <p className="text-[8px] text-brand-text/50 font-bold uppercase tracking-wider text-center">
+              An Open Source SPA Menu Project
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
       {loading ? (
         <div className="bg-gray-100 text-gray-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-200">
-          Verificando...
+          Checking...
         </div>
       ) : isOpen ? (
         <div className="bg-brand-accent/10 text-brand-accent text-xs font-bold px-3 py-1 rounded-full animate-pulse border border-brand-accent/20">
-          Abierto
+          Open
         </div>
       ) : (
         <div className="bg-red-50 text-red-500 text-xs font-bold px-3 py-1 rounded-full border border-red-100">
-          Cerrado
+          Closed
         </div>
       )}
     </div>
