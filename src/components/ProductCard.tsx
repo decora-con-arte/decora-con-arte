@@ -1,22 +1,12 @@
 import { memo, useEffect, useRef, useState } from 'react';
+import { Image as ImageIcon } from 'lucide-react';
 import type { Product } from '../types/product';
 import { useCart } from '../context/CartContext';
 
 const ADD_HIGHLIGHT_MS = 250;
 
-const CATEGORY_ICONS: Record<string, string> = {
-  PICADAS: '🥗',
-  CARNES: '🥩',
-  BURROS: '🌯',
-  HAMBURGUESAS: '🍔',
-  PAPAS: '🍟',
-  PERROS: '🌭',
-  BEBIDAS: '🥤',
-  OTRO: '🍽️'
-};
-
 interface ProductCardProps {
-  product: Product;
+  product: Product; 
   onSelect: (product: Product) => void;
   onAddToCart: (product: Product) => void;
 }
@@ -44,14 +34,13 @@ export const ProductCard = memo(function ProductCard({ product, onSelect, onAddT
   
   const priceFormatted = product.price ? product.price.toLocaleString() : '0';
   const isImageUrl = product.image?.startsWith('http://') || product.image?.startsWith('https://');
-  const fallbackIcon = CATEGORY_ICONS[product.category] || CATEGORY_ICONS.OTRO;
 
   return (
     <div 
       onClick={() => onSelect(product)}
-      className="bg-white p-4 rounded-2xl shadow-[0_4px_12px_-4px_rgba(0,0,0,0.08)] border border-gray-100 flex items-center gap-4 active:scale-[0.98] hover:shadow-md transition-[transform,box-shadow] cursor-pointer"
+      className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 active:scale-[0.98] hover:shadow-md transition-all cursor-pointer"
     >
-      <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-3xl shadow-inner border border-gray-100 overflow-hidden flex-shrink-0 relative">
+      <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 shadow-inner border border-gray-100 overflow-hidden flex-shrink-0 relative">
         {inCart && (
           <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-primary text-white text-[10px] font-black flex items-center justify-center shadow-sm border border-white z-10">
             {cartQuantity}
@@ -66,17 +55,15 @@ export const ProductCard = memo(function ProductCard({ product, onSelect, onAddT
             onError={() => setImgError(true)}
           />
         ) : (
-          <span role="img" aria-label={product.category} className="opacity-80">
-            {fallbackIcon}
-          </span>
+          <ImageIcon size={24} strokeWidth={1.5} />
         )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <h3 className="font-black text-brand-text text-lg leading-tight truncate">
+        <h3 className="font-bold text-brand-text text-base leading-tight truncate">
           {product.name}
         </h3>
-        <p className="text-xs text-brand-text/50 mt-1 line-clamp-2 font-medium">
+        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
           {product.description}
         </p>
         <div className="mt-2 flex items-center justify-between">
