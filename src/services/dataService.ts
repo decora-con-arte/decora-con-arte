@@ -1,9 +1,10 @@
 import Papa from 'papaparse';
-import type { Category, Product } from '../types/models';
+import type { Category, Product, StoreSchedule } from '../types/models';
 
 const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID;
 const PRODUCTS_GID = import.meta.env.VITE_SHEET_GID_PRODUCTS ?? '0';
 const CATEGORIES_GID = import.meta.env.VITE_SHEET_GID_CATEGORIES;
+const SCHEDULE_GID = import.meta.env.VITE_SHEET_GID_SCHEDULE;
 
 const getSheetUrl = (gid: string | number) =>
   `https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${gid}&single=true&output=csv`;
@@ -71,6 +72,7 @@ export const dataService = {
       };
     });
   },
+
   getCategories: async (): Promise<Category[]> => {
     return fetchSheetData<Category>(CATEGORIES_GID, (data) => {
       const name = (data.Nombre || data.nombre || data.Name || '').trim();
@@ -81,6 +83,24 @@ export const dataService = {
         id: name.toUpperCase().replace(/\s+/g, '-'), // Ej: "Hamburguesas" -> "HAMBURGUESAS"
         name: name,
         icon: (data.Icono || data.icono || data.Icon || '📋').trim()
+      };
+    });
+  },
+  
+  getSchedule: async (): Promise<StoreSchedule[]> => {
+    return fetchSheetData<StoreSchedule>(SCHEDULE_GID, (data) => {
+      const day = (data.Day || data.Dia || '').trim();
+      
+      if (!day) return null;
+
+      const rawIsOpen = (data.IsOpen || data.Abierto || 'FALSE').toString().trim().toUpperCase();
+      const isOpen = ['TRUE', '1', 'SI', 'YES'].includes(rawIsOpen);
+
+      return {
+        day: day,
+        startTime: (data['Start Time'] || data.HoraInicio || '00:00').trim(),
+        endTime: (data['End Time'] || data.HoraFin || '23:59').trim(),
+        isOpen: isOpen
       };
     });
   }

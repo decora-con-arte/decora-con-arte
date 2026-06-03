@@ -13,3 +13,10 @@ export interface Product {
   image?: string;
   isAvailable: boolean;
 }
+
+export interface StoreSchedule {
+  day: string;
+  startTime: string;
+  endTime: string;
+  isOpen: boolean;
+}
