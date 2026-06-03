@@ -1,8 +1,9 @@
 import Papa from 'papaparse';
-import type { Product } from '../types/models';
+import type { Category, Product } from '../types/models';
 
-const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID ?? '';
+const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID;
 const PRODUCTS_GID = import.meta.env.VITE_SHEET_GID_PRODUCTS ?? '0';
+const CATEGORIES_GID = import.meta.env.VITE_SHEET_GID_CATEGORIES;
 
 const getSheetUrl = (gid: string | number) =>
   `https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${gid}&single=true&output=csv`;
@@ -67,6 +68,19 @@ export const dataService = {
         category: (data.Categoría || data.categoría || data.Category || 'OTRO').toUpperCase().replace(/\s+/g, ' ').trim(),
         image: (data.Imagen || data.imagen || data.Image || '').trim(),
         isAvailable: isAvailable
+      };
+    });
+  },
+  getCategories: async (): Promise<Category[]> => {
+    return fetchSheetData<Category>(CATEGORIES_GID, (data) => {
+      const name = (data.Nombre || data.nombre || data.Name || '').trim();
+      
+      if (!name) return null; // Ignora filas vacías
+
+      return {
+        id: name.toUpperCase().replace(/\s+/g, '-'), // Ej: "Hamburguesas" -> "HAMBURGUESAS"
+        name: name,
+        icon: (data.Icono || data.icono || data.Icon || '📋').trim()
       };
     });
   }
