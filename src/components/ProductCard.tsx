@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
-import type { Product } from '../types/product';
+import type { Product } from '../types/models';
 import { useCart } from '../context/CartContext';
 
 const ADD_HIGHLIGHT_MS = 250;

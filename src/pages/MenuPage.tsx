@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { fetchProducts, fetchSpecialMeal } from '../services/googleSheets';
 import { ProductCard } from '../components/ProductCard';
-import type { Product, SpecialMeal } from '../types/product';
+import type { Product, SpecialMeal } from '../types/models';
 import { ChevronLeft, ChevronRight, X, Utensils } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
