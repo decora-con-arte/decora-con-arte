@@ -20,3 +20,14 @@ export interface StoreSchedule {
   endTime: string;
   isOpen: boolean;
 }
+
+export interface SpecialMeal {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  isActive: boolean;
+  startDate?: string;
+  endDate?: string;
+}
