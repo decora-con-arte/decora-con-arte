@@ -1,10 +1,28 @@
 import Papa from 'papaparse';
-import type { Category, Product, StoreSchedule } from '../types/models';
+import type { Category, Product, StoreSchedule, SpecialMeal } from '../types/models';
 
 const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID;
 const PRODUCTS_GID = import.meta.env.VITE_SHEET_GID_PRODUCTS ?? '0';
 const CATEGORIES_GID = import.meta.env.VITE_SHEET_GID_CATEGORIES;
 const SCHEDULE_GID = import.meta.env.VITE_SHEET_GID_SCHEDULE;
+const SPECIALS_GID = import.meta.env.VITE_SHEET_GID_SPECIALS;
+const SPECIALS_LIMIT = Number(import.meta.env.VITE_SPECIALS_LIMIT) || 5;
+
+function parseSheetDate(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  const cleaned = dateStr.trim();
+  const parts = cleaned.split('/');
+  if (parts.length === 3) {
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+      return new Date(year, month, day);
+    }
+  }
+  const fallback = new Date(cleaned);
+  return isNaN(fallback.getTime()) ? null : fallback;
+}
 
 const getSheetUrl = (gid: string | number) =>
   `https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${gid}&single=true&output=csv`;
@@ -103,16 +121,73 @@ export const dataService = {
     return fetchSheetData<Category>(CATEGORIES_GID, (data) => {
       const name = (data.Nombre || data.nombre || data.Name || '').trim();
       
-      if (!name) return null; // Ignora filas vacías
+      if (!name) return null; 
 
       return {
-        id: name.toUpperCase().replace(/\s+/g, '-'), // Ej: "Hamburguesas" -> "HAMBURGUESAS"
+        id: name.toUpperCase().replace(/\s+/g, '-'),
         name: name,
         icon: (data.Icono || data.icono || data.Icon || '📋').trim()
       };
     });
   },
   
+  getSpecialMeals: async (): Promise<SpecialMeal[]> => {
+    if (!SPECIALS_GID) return [];
+
+    return fetchSheetData<SpecialMeal>(SPECIALS_GID, (data) => {
+      const rawName = (data.Name || data.Nombre || '').trim();
+      if (!rawName) return null;
+
+      const rawPrice = String(data.Price || data.Precio || '0').replace(/[^0-9.,]/g, '');
+      let price = 0;
+      if (rawPrice.includes(',') && rawPrice.includes('.')) {
+        price = parseFloat(rawPrice.replace(/\./g, '').replace(',', '.'));
+      } else if (rawPrice.includes(',')) {
+        price = parseFloat(rawPrice.replace(',', '.'));
+      } else if (rawPrice.includes('.')) {
+        const parts = rawPrice.split('.');
+        price = parseFloat(parts[parts.length - 1].length <= 2 ? rawPrice : rawPrice.replace(/\./g, ''));
+      } else {
+        price = parseFloat(rawPrice);
+      }
+      if (isNaN(price) || price <= 0) return null;
+
+      const isActive = ['SÍ', 'TRUE', '1', 'YES', 'VERDADERO'].includes(
+        String(data.IsActive || data.isActive || data.Activo || 'FALSE').toUpperCase().trim()
+      );
+
+      if (!isActive) return null;
+
+      const now = new Date();
+      const rawStart = (data['Start Date'] || data.StartDate || data['Fecha Inicio'] || '').trim();
+      const rawEnd = (data['End Date'] || data.EndDate || data['Fecha Fin'] || '').trim();
+      const startDate = rawStart ? parseSheetDate(rawStart) : null;
+      const endDate = rawEnd ? parseSheetDate(rawEnd) : null;
+
+      if (startDate && endDate) {
+        if (now < startDate || now > endDate) return null;
+      } else if (startDate && now < startDate) {
+        return null;
+      } else if (endDate && now > endDate) {
+        return null;
+      }
+
+      const safeName = rawName;
+      const safeId = safeName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+      return {
+        id: safeId,
+        name: safeName,
+        description: (data.Description || data.Descripción || data.Descripcion || '').trim(),
+        price,
+        image: (data.Image || data.Imagen || data.imagen || '').trim(),
+        isActive,
+        startDate: rawStart || undefined,
+        endDate: rawEnd || undefined,
+      };
+    }).then(items => items.slice(0, SPECIALS_LIMIT));
+  },
+
   getSchedule: async (): Promise<StoreSchedule[]> => {
     return fetchSheetData<StoreSchedule>(SCHEDULE_GID, (data) => {
       const day = (data.Day || data.Dia || '').trim();
