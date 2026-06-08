@@ -1,11 +1,14 @@
 import Papa from 'papaparse';
-import type { Category, Product, StoreSchedule, SpecialMeal } from '../types/models';
+import type { Category, Product, StoreSchedule, SpecialMeal, Ingredient } from '../types/models';
 
 const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID;
+
 const PRODUCTS_GID = import.meta.env.VITE_SHEET_GID_PRODUCTS ?? '0';
 const CATEGORIES_GID = import.meta.env.VITE_SHEET_GID_CATEGORIES;
 const SCHEDULE_GID = import.meta.env.VITE_SHEET_GID_SCHEDULE;
 const SPECIALS_GID = import.meta.env.VITE_SHEET_GID_SPECIALS;
+const INGREDIENTS_GID = import.meta.env.VITE_SHEET_GID_INGREDIENTS;
+
 const SPECIALS_LIMIT = Number(import.meta.env.VITE_SPECIALS_LIMIT) || 5;
 
 function parseSheetDate(dateStr: string): Date | null {
@@ -202,6 +205,45 @@ export const dataService = {
         startTime: (data['Start Time'] || data.HoraInicio || '00:00').trim(),
         endTime: (data['End Time'] || data.HoraFin || '23:59').trim(),
         isOpen: isOpen
+      };
+    });
+  },
+
+  getIngredients: async (): Promise<Ingredient[]> => {
+    return fetchSheetData<Ingredient>(INGREDIENTS_GID, (data, index) => {
+      const name = (data.Nombre || data.Name || '').trim();
+      if (!name) return null;
+
+      const category = (data.Categoría || data.Category || 'OTRO').trim();
+      const rawPrice = String(data.Price || data.Precio || data.PrecioExtra || data.ExtraPrice || '0').replace(/[^0-9.,]/g, '');
+      
+      let extraPrice = 0;
+      if (rawPrice.includes(',') && rawPrice.includes('.')) {
+        extraPrice = parseFloat(rawPrice.replace(/\./g, '').replace(',', '.'));
+      } else if (rawPrice.includes(',')) {
+        extraPrice = parseFloat(rawPrice.replace(',', '.'));
+      } else if (rawPrice.includes('.')) {
+        const parts = rawPrice.split('.');
+        extraPrice = parseFloat(parts[parts.length - 1].length <= 2 ? rawPrice : rawPrice.replace(/\./g, ''));
+      } else {
+        extraPrice = parseFloat(rawPrice) || 0;
+      }
+
+      const isAvailableRaw = String(data.IsActive || data.isActive || data.Disponibilidad || data.isAvailable || 'Sí').toUpperCase().trim();
+      const isAvailable = ['SÍ', 'TRUE', '1', 'YES'].includes(isAvailableRaw);
+      
+      const isRequiredRaw = String(data.Required || data.isRequired || data.Obligatorio || 'NO').toUpperCase().trim();
+      const isRequired = ['SÍ', 'TRUE', '1', 'YES'].includes(isRequiredRaw);
+
+      return {
+        id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        name,
+        category,
+        extraPrice,
+        isAvailable,
+        isRequired,
+        stepOrder: parseInt(data.Order || data.Orden || data.StepOrder || '0') || index + 1,
+        maxFree: parseInt(data.MaxFree || data.Gratis || '0') || 0
       };
     });
   }
