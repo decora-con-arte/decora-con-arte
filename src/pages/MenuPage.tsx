@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { dataService } from '../services/dataService'; 
 import { ProductCard } from '../components/ProductCard';
-import type { Product, Category } from '../types/models'; 
+import type { Product, Category, SpecialMeal } from '../types/models'; 
 import { ChevronLeft, ChevronRight, X, Utensils } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -17,6 +17,7 @@ export function MenuPage() {
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('ALL');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [specialMeals, setSpecialMeals] = useState<SpecialMeal[]>([]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -24,10 +25,13 @@ export function MenuPage() {
     useEffect(() => {
         async function loadData() {
             try {
-                const [productsData, categoriesData] = await Promise.all([
+                const [productsData, categoriesData, specialsData] = await Promise.all([
                     dataService.getProducts(),
-                    dataService.getCategories()
+                    dataService.getCategories(),
+                    dataService.getSpecialMeals()
                 ]);
+
+                setSpecialMeals(specialsData);
 
                 setProducts(productsData.filter(p => p.isAvailable));
 
@@ -97,6 +101,65 @@ export function MenuPage() {
                 </div>
                 <span className="absolute -bottom-6 -right-4 text-9xl opacity-20 rotate-12 drop-shadow-2xl">🍔</span>
             </div>
+
+            {specialMeals.length > 0 && (
+                <div className="space-y-2">
+                    <span className="text-[10px] text-brand-primary font-black uppercase tracking-wider px-1">Specials</span>
+                    <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 snap-x snap-mandatory scroll-smooth">
+                        {specialMeals.map((meal) => (
+                            <div
+                                key={meal.id}
+                                onClick={() => handleSelectProduct({
+                                    id: meal.id,
+                                    name: meal.name,
+                                    description: meal.description,
+                                    price: meal.price,
+                                    category: 'Especial',
+                                    image: meal.image,
+                                    isAvailable: true
+                                })}
+                                className="bg-white border border-gray-100 rounded-2xl p-3 shadow-sm active:scale-[0.98] transition-all cursor-pointer flex items-center gap-4 hover:border-orange-200 snap-start shrink-0 w-full"
+                            >
+                                {meal.image ? (
+                                    <img
+                                        src={meal.image}
+                                        alt={meal.name}
+                                        className="w-16 h-16 rounded-xl object-cover border border-gray-100 shadow-sm shrink-0"
+                                    />
+                                ) : (
+                                    <div className="w-16 h-16 bg-orange-50 rounded-xl flex items-center justify-center text-brand-primary shrink-0">
+                                        <Utensils size={24} />
+                                    </div>
+                                )}
+                                <div className="flex flex-col flex-1 min-w-0">
+                                    <span className="text-[10px] text-brand-primary font-black uppercase tracking-wider mb-0.5">Daily Special</span>
+                                    <h3 className="font-black text-brand-text text-sm leading-tight line-clamp-1">{meal.name}</h3>
+                                    <span className="font-black text-brand-text text-sm mt-1">${meal.price.toLocaleString()}</span>
+                                </div>
+                                <div className="pr-2">
+                                    <div
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddToCart({
+                                                id: meal.id,
+                                                name: meal.name,
+                                                description: meal.description,
+                                                price: meal.price,
+                                                category: 'Especial',
+                                                image: meal.image,
+                                                isAvailable: true
+                                            });
+                                        }}
+                                        className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center font-black shadow-md cursor-pointer active:scale-90 transition-transform"
+                                    >
+                                        +
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="flex items-center gap-2">
                 <button onClick={() => scroll('left')} className="hidden md:flex p-2 bg-white rounded-full shadow-sm text-gray-500 hover:text-brand-primary border border-gray-200">
