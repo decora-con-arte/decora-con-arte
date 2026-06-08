@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus, Check, ChevronDown } from 'lucide-react';
-import { fetchIngredients } from '../services/googleSheets';
-import type { Ingredient } from '../types/models';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 

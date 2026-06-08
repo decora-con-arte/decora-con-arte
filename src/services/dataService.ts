@@ -48,26 +48,52 @@ export const dataService = {
 
   getProducts: async (): Promise<Product[]> => {
     return fetchSheetData<Product>(PRODUCTS_GID, (data, index) => {
+      
+      let rawPrice = String(data.Price || data.Precio || data.precio || '0').trim();
+      
+      let price = 0;
+      
+      rawPrice = rawPrice.replace(/[$\s]/g, '');
 
-      const rawName = (data.Nombre || data.nombre || data.Name || '').trim();
+      if (rawPrice.includes(',') && rawPrice.includes('.')) {
+        price = parseFloat(rawPrice.replace(/\./g, '').replace(',', '.'));
+      } else if (rawPrice.includes(',')) {
+        price = parseFloat(rawPrice.replace(',', '.'));
+      } else if (rawPrice.includes('.')) {
+
+        const parts = rawPrice.split('.');
+        if (parts[parts.length - 1].length <= 2) {
+            price = parseFloat(rawPrice);
+        } else {
+            price = parseFloat(rawPrice.replace(/\./g, ''));
+        }
+      } else {
+        price = parseFloat(rawPrice);
+      }
+
+      if (isNaN(price) || price <= 0) {
+        console.warn(`Producto descartado: ${data.Name || 'Sin nombre'} | Valor procesado: ${price}`);
+        return null;
+      }
+
+      const rawName = (data.Name || data.Nombre || data.nombre || '').trim();
       const safeName = rawName || `Item-${index + 1}`;
+      const safeId = data.ID?.trim() || data.id?.trim() || safeName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       
-      const safeId = data.id?.trim() || safeName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      
-      const rawPriceStr = String(data.Precio || data.precio || data.Price || '0').replace(/[^0-9]/g, '');
-      const price = parseInt(rawPriceStr, 10);
+      const isAvailableRaw = String(data.isAvailable || data.Available || data.Disponibilidad || 'TRUE').toUpperCase().trim();
+      const isAvailable = ['SÍ', 'TRUE', '1', 'YES'].includes(isAvailableRaw);
 
-      const isAvailable = ['SÍ', 'TRUE', '1', 'YES'].includes(
-        String(data.Disponibilidad || data.disponibilidad || data.Available || 'TRUE').toUpperCase().trim()
-      );
+      const description = (data.Description || data.Descripción || data.descripción || '').trim();
+      const rawCategory = (data.Category || data.Categoría || data.categoría || 'OTRO').trim();
+      const categoryId = rawCategory.toUpperCase().replace(/\s+/g, '-');
 
       return {
         id: safeId,
         name: safeName,
-        description: (data.Descripción || data.descripción || data.Description || '').trim(),
-        price: price || 0,
-        category: (data.Categoría || data.categoría || data.Category || 'OTRO').toUpperCase().replace(/\s+/g, ' ').trim(),
-        image: (data.Imagen || data.imagen || data.Image || '').trim(),
+        description: description,
+        price: price,
+        category: categoryId,
+        image: (data.Image || data.Imagen || data.imagen || '').trim(),
         isAvailable: isAvailable
       };
     });

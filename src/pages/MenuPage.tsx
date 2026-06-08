@@ -15,7 +15,7 @@ export function MenuPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     
     const [loading, setLoading] = useState(true);
-    const [activeCategory, setActiveCategory] = useState('All');
+    const [activeCategory, setActiveCategory] = useState('ALL');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -31,8 +31,15 @@ export function MenuPage() {
 
                 setProducts(productsData.filter(p => p.isAvailable));
 
-                const defaultCategory: Category = { id: 'All', name: 'Todos', icon: '📋' };
-                setCategories([defaultCategory, ...categoriesData]);
+                const hasAllCategory = categoriesData.some(c => c.id === 'ALL');
+                
+                if (hasAllCategory) {
+                    setCategories(categoriesData);
+                } else {
+                    const defaultCategory: Category = { id: 'ALL', name: 'All', icon: '📋' };
+                    setCategories([defaultCategory, ...categoriesData]);
+                }
+
             } catch (error) {
                 console.error("Error al cargar la hoja de cálculo:", error);
             } finally {
@@ -73,7 +80,7 @@ export function MenuPage() {
     };
 
     const filteredProducts = useMemo(() => products.filter(product => {
-        if (activeCategory === 'All') return true;
+        if (activeCategory === 'ALL') return true;
         return product.category === activeCategory;
     }), [products, activeCategory]);
 
@@ -85,8 +92,8 @@ export function MenuPage() {
                 className="bg-gradient-to-br from-brand-primary to-orange-600 rounded-3xl p-6 shadow-[0_8px_20px_-6px_rgba(249,115,22,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-orange-700"
             >
                 <div className="relative z-10">
-                    <span className="bg-brand-nav text-brand-text text-[10px] font-black uppercase px-2 py-1 rounded-md mb-2 inline-block shadow-sm">El Plato Estrella</span>
-                    <h2 className="text-3xl font-black italic text-white drop-shadow-md leading-none mt-1">¡Arma tu<br />Melona!</h2>
+                    <span className="bg-brand-nav text-brand-text text-[10px] font-black uppercase px-2 py-1 rounded-md mb-2 inline-block shadow-sm">Main Product</span>
+                    <h2 className="text-3xl font-black italic text-white drop-shadow-md leading-none mt-1">¡Custom Your<br />Product!</h2>
                 </div>
                 <span className="absolute -bottom-6 -right-4 text-9xl opacity-20 rotate-12 drop-shadow-2xl">🍔</span>
             </div>
@@ -119,7 +126,7 @@ export function MenuPage() {
 
             <div className="space-y-4">
                 <h2 className="text-lg font-black text-brand-text uppercase px-1 border-b-2 border-gray-100 pb-2">
-                    {activeCategory === 'All' 
+                    {activeCategory === 'ALL' 
                         ? 'Menú Completo' 
                         : categories.find(c => c.id === activeCategory)?.name || activeCategory}
                 </h2>
