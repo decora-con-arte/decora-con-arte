@@ -31,3 +31,14 @@ export interface SpecialMeal {
   startDate?: string;
   endDate?: string;
 }
+
+export interface Ingredient {
+  id: string;
+  name: string;
+  category: string;
+  extraPrice: number;
+  isAvailable: boolean;
+  isRequired?: boolean;
+  stepOrder?: number;
+  maxFree?: number;
+}
