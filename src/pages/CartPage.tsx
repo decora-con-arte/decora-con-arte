@@ -40,7 +40,7 @@ export function CartPage() {
     const phone = import.meta.env.VITE_WHATSAPP_PHONE;
     
     const messageLines = [
-      `*¡Hola!* 🍔`,
+      `*¡Hola!*`,
       `Quiero hacer un pedido:`,
     ];
     
@@ -75,7 +75,7 @@ export function CartPage() {
           <ShoppingBag size={48} className="text-brand-primary/30" />
         </div>
         <h2 className="text-2xl font-black text-brand-text mb-2 uppercase">Tu carrito está vacío</h2>
-        <p className="text-gray-500 text-sm mb-8 font-medium">Parece que aún no has elegido tu Melona ideal. ¡No dejes que tu barriga sufra!</p>
+        <p className="text-gray-500 text-sm mb-8 font-medium">Parece que aún no has elegido tu producto ideal.</p>
         <button 
           onClick={() => navigate('/')}
           className="btn-cta !w-auto px-8 flex items-center gap-2"
@@ -129,7 +129,7 @@ export function CartPage() {
           <ShoppingCart size={20} strokeWidth={2.5} />
           <span>Pedir por WhatsApp</span>
         </button>
-        <p className="checkout-bar__hint">Atención inmediata · Don Melona</p>
+        <p className="checkout-bar__hint">Atención inmediata · Decora Con Arte</p>
       </div>
     </div>
   );
