@@ -25,35 +25,35 @@ export function Layout({ children }: LayoutProps) {
     <div className="mx-auto h-full w-full md:max-w-2xl lg:max-w-5xl bg-brand-bg flex flex-col relative md:shadow-2xl md:border-x md:border-gray-200 overflow-hidden">
       
       <header className="shrink-0 z-50 bg-brand-bg/95 backdrop-blur-md p-4 border-b border-gray-100 flex items-center justify-between gap-4 shadow-sm">
-        <div className="flex items-center gap-3 shrink-0">
-          <img 
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+            <img 
             src="/logo.png" 
-            alt="Don Melona Logo" 
-            className="h-12 md:h-14 w-auto object-contain"
-          />
-          <div className="hidden md:block leading-tight">
-            <h1 className="text-base md:text-lg font-black tracking-tight text-brand-primary uppercase">
-              Sheets Menu SPA
+            alt="logo" 
+            className="h-12 md:h-14 w-auto object-contain shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+            <h1 className="text-center text-sm md:text-lg font-black tracking-tight text-brand-primary uppercase truncate">
+                Sheets Menu SPA
             </h1>
-            <p className="text-[8px] md:text-[9px] text-brand-text/50 font-bold uppercase tracking-wider">
-              An Open Source SPA Menu Project
+            <p className="text-center text-[11px] md:text-[13px] text-brand-text/50 font-bold uppercase tracking-wider truncate">
+                An Open Source SPA Menu Project
             </p>
-          </div>
+            </div>
         </div>
-        <div className="flex items-center gap-2">
-          {loading ? (
+        <div className="flex items-center gap-2 shrink-0">
+            {loading ? (
             <div className="bg-gray-100 text-gray-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-200">
-              Checking...
+                Checking...
             </div>
-          ) : isOpen ? (
+            ) : isOpen ? (
             <div className="bg-brand-accent/10 text-brand-accent text-xs font-bold px-3 py-1 rounded-full animate-pulse border border-brand-accent/20">
-              Open
+                Open
             </div>
-          ) : (
+            ) : (
             <div className="bg-red-50 text-red-500 text-xs font-bold px-3 py-1 rounded-full border border-red-100">
-              Closed
+                Closed
             </div>
-          )}
+            )}
         </div>
       </header>
 
