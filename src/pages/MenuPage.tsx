@@ -147,7 +147,7 @@ export function MenuPage() {
                         flex items-center gap-4 hover:border-orange-200 hover:shadow-md 
                         snap-start shrink-0 group
                         ${specialMeals.length === 1 
-                        ? 'w-[85%] md:w-[450px] lg:w-[500px]'
+                        ? 'w-[100%] md:w-[450px] lg:w-[500px]'
                         : ''
                         }
                         ${specialMeals.length === 2 
