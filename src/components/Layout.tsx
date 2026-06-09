@@ -24,38 +24,40 @@ export function Layout({ children }: LayoutProps) {
     <ToastProvider>
     <div className="mx-auto h-full w-full md:max-w-2xl lg:max-w-5xl bg-brand-bg flex flex-col relative md:shadow-2xl md:border-x md:border-gray-200 overflow-hidden">
       
-      <header className="shrink-0 z-50 bg-brand-bg/95 backdrop-blur-md p-4 border-b border-gray-100 flex items-center justify-between gap-4 shadow-sm">
+        <header className="shrink-0 z-50 bg-brand-bg/95 backdrop-blur-md p-4 border-b border-gray-100 flex items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3 min-w-0 flex-1">
+
             <img 
-            src="/logo.png" 
-            alt="logo" 
-            className="h-12 md:h-14 w-auto object-contain shrink-0"
+            src="/icon.png" 
+            alt="Icon" 
+            className="h-12 md:h-18 w-auto object-contain shrink-0"
             />
-            <div className="flex-1 min-w-0">
-            <h1 className="text-center text-sm md:text-lg font-black tracking-tight text-brand-primary uppercase truncate">
-                Sheets Menu SPA
-            </h1>
-            <p className="text-center text-[11px] md:text-[13px] text-brand-text/50 font-bold uppercase tracking-wider truncate">
-                An Open Source SPA Menu Project
-            </p>
+            
+            <div className="flex-1 flex items-center justify-center min-w-0">
+            <img 
+                src="/logo.png" 
+                alt="Logo" 
+                className="h-12 md:h-18 w-auto object-contain max-w-[120px] md:max-w-[200px]"
+            />
             </div>
         </div>
+        
         <div className="flex items-center gap-2 shrink-0">
             {loading ? (
             <div className="bg-gray-100 text-gray-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-200">
-                Checking...
+                Verificando..
             </div>
             ) : isOpen ? (
             <div className="bg-brand-accent/10 text-brand-accent text-xs font-bold px-3 py-1 rounded-full animate-pulse border border-brand-accent/20">
-                Open
+                Abierto
             </div>
             ) : (
             <div className="bg-red-50 text-red-500 text-xs font-bold px-3 py-1 rounded-full border border-red-100">
-                Closed
+                Cerrado
             </div>
             )}
         </div>
-      </header>
+        </header>
 
       <main className="flex flex-1 min-h-0 flex-col overflow-hidden p-4 md:p-6">
         {children}
