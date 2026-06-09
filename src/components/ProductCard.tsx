@@ -74,7 +74,7 @@ export const ProductCard = memo(function ProductCard({ product, onSelect, onAddT
             onClick={handleAddClick}
             className={`min-w-[4.5rem] text-xs font-black px-4 py-2 rounded-lg transition-all shadow-sm active:scale-95 ${
               isAddHighlighted || inCart
-                ? 'bg-brand-primary text-white shadow-md shadow-orange-200/60'
+                ? 'bg-brand-primary text-white shadow-md shadow-[#F2C1C1]-200/60'
                 : 'bg-gray-100 text-brand-text active:bg-brand-primary active:text-white hover:bg-brand-primary hover:text-white'
             }`}
           >

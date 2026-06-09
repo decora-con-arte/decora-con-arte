@@ -71,7 +71,7 @@ export function CartPage() {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-6 text-center animate-in fade-in zoom-in-95 duration-500">
-        <div className="w-32 h-32 bg-orange-50 rounded-full flex items-center justify-center mb-6">
+        <div className="w-32 h-32 bg-[#F2C1C1]-50 rounded-full flex items-center justify-center mb-6">
           <ShoppingBag size={48} className="text-brand-primary/30" />
         </div>
         <h2 className="text-2xl font-black text-brand-text mb-2 uppercase">Tu carrito está vacío</h2>

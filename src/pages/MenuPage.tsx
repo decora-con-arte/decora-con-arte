@@ -32,7 +32,6 @@ export function MenuPage() {
                 ]);
 
                 setSpecialMeals(specialsData);
-
                 setProducts(productsData.filter(p => p.isAvailable));
 
                 const hasAllCategory = categoriesData.some(c => c.id === 'ALL');
@@ -90,10 +89,9 @@ export function MenuPage() {
 
     return (
         <div className="page-scroll -m-4 space-y-6 p-4">
-
             <div
                 onClick={() => navigate('/builder')}
-                className="bg-gradient-to-br from-[#F2C1C1] to-[#D57479] rounded-3xl p-6 md:w-full shadow-[0_8px_20px_-6px_rgba(213,116,121,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-[#d57479] hover:shadow-[0_12px_25px_-6px_rgba(213,116,121,0.6)]"
+                className="bg-gradient-to-br from-[#F2C1C1] to-[#D57479] rounded-3xl p-6 md:w-full shadow-[0_8px_20px_-6px_rgba(213,116,121,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-[#C4656A] hover:shadow-[0_12px_25px_-6px_rgba(213,116,121,0.6)]"
             >
                 <div className="relative z-10">
                     <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black uppercase px-2 py-1 rounded-md mb-2 inline-block shadow-sm border border-white/20">
@@ -109,182 +107,141 @@ export function MenuPage() {
             </div>
 
             {specialMeals.length > 0 && (
-            <div className="space-y-3">
-                <div className="flex items-center justify-between px-1">
-                {specialMeals.length > 3 && (
-                    <span className="text-[10px] text-gray-400 font-medium hidden md:block">
-                    Desliza para ver más →
-                    </span>
-                )}
-                </div>
-
-                <div 
-                className={`
-                    flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 snap-x snap-mandatory scroll-smooth
-                    ${specialMeals.length === 1 
-                    ? 'md:justify-center md:overflow-x-visible md:mx-0 md:px-0 md:snap-none' 
-                    : ''
-                    }
-                    ${specialMeals.length === 2 
-                    ? 'md:grid md:grid-cols-2 md:overflow-x-visible md:mx-0 md:px-0 md:snap-none' 
-                    : ''
-                    }
-                    ${specialMeals.length >= 3 
-                    ? 'md:snap-x md:snap-mandatory' 
-                    : ''
-                    }
-                `}
-                >
-                {specialMeals.map((meal) => (
-                    <div
-                    key={meal.id}
-                    onClick={() => handleSelectProduct({
-                        id: meal.id,
-                        name: meal.name,
-                        description: meal.description,
-                        price: meal.price,
-                        category: 'Special',
-                        image: meal.image,
-                        isAvailable: true
-                    })}
-                    className={`
-                        bg-white border border-gray-100 rounded-2xl p-4 shadow-sm 
-                        active:scale-[0.98] transition-all duration-200 cursor-pointer 
-                        flex items-center gap-4 hover:border-[#d57479] hover:shadow-md 
-                        snap-start shrink-0 group
-                        ${specialMeals.length === 1 
-                        ? 'w-[100%] md:w-[450px] lg:w-[500px]'
-                        : ''
-                        }
-                        ${specialMeals.length === 2 
-                        ? 'w-[85%] md:w-full'
-                        : ''
-                        }
-                        ${specialMeals.length >= 3 
-                        ? 'w-[280px] sm:w-[320px] lg:w-[350px]'
-                        : ''
-                        }
-                    `}
-                    >
-                    <div className="relative shrink-0">
-                        {meal.image ? (
-                        <img
-                            src={meal.image}
-                            alt={meal.name}
-                            className={`
-                            rounded-xl object-cover border border-gray-100 shadow-sm
-                            transition-transform duration-200 group-hover:scale-105
-                            ${specialMeals.length === 1 
-                                ? 'w-24 h-24 md:w-28 md:h-28' 
-                                : 'w-16 h-16'
-                            }
-                            `}
-                            loading="lazy"
-                        />
-                        ) : (
-                        <div className={`
-                            bg-orange-50 rounded-xl flex items-center justify-center text-brand-primary
-                            ${specialMeals.length === 1 
-                            ? 'w-24 h-24 md:w-28 md:h-28' 
-                            : 'w-16 h-16'
-                            }
-                        `}>
-                            <Utensils size={specialMeals.length === 1 ? 36 : 24} />
-                        </div>
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between px-1">
+                        {specialMeals.length > 3 && (
+                            <span className="text-[10px] text-gray-400 font-medium hidden md:block">
+                                Desliza para ver más →
+                            </span>
                         )}
-
-                        <span className={`
-                        absolute -top-1.5 -right-1.5 bg-brand-primary text-white 
-                        text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-sm
-                        ${specialMeals.length === 1 ? 'md:text-[10px] md:px-2' : ''}
-                        `}>
-                        ★
-                        </span>
                     </div>
 
-                    <div className="flex flex-col flex-1 min-w-0">
-                        <span className="text-[10px] text-brand-primary font-black uppercase tracking-wider mb-0.5">
-                        Daily Special
-                        </span>
-                        <h3 className={`
-                        font-black text-brand-text leading-tight line-clamp-1
-                        ${specialMeals.length === 1 
-                            ? 'text-base md:text-lg' 
-                            : 'text-sm'
-                        }
-                        `}>
-                        {meal.name}
-                        </h3>
-                        {meal.description && specialMeals.length === 1 && (
-                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2 hidden md:block">
-                            {meal.description}
-                        </p>
-                        )}
-                        <span className={`
-                        font-black text-brand-text mt-1
-                        ${specialMeals.length === 1 
-                            ? 'text-lg md:text-xl' 
-                            : 'text-sm'
-                        }
-                        `}>
-                        ${meal.price.toLocaleString()}
-                        </span>
-                    </div>
-
-                    <div className="pr-1">
-                        <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleAddToCart({
-                            id: meal.id,
-                            name: meal.name,
-                            description: meal.description,
-                            price: meal.price,
-                            category: 'Special',
-                            image: meal.image,
-                            isAvailable: true
-                            });
-                        }}
-                        className={`
-                            rounded-full bg-brand-primary text-white 
-                            flex items-center justify-center font-black 
-                            shadow-md cursor-pointer active:scale-90 
-                            transition-all hover:bg-orange-600 hover:shadow-lg
-                            ${specialMeals.length === 1 
-                            ? 'w-10 h-10 md:w-12 md:h-12 text-lg' 
-                            : 'w-8 h-8'
-                            }
-                        `}
-                        aria-label={`Add ${meal.name} to cart`}
-                        >
-                        +
-                        </button>
-                    </div>
-                    </div>
-                ))}
-                </div>
-
-                {specialMeals.length > 3 && (
-                <div className="flex justify-center gap-1.5 md:hidden">
-                    {specialMeals.map((_, index) => (
                     <div 
-                        key={index}
                         className={`
-                        rounded-full transition-all duration-300
-                        ${index === 0 
-                            ? 'w-4 h-1.5 bg-brand-primary' 
-                            : 'w-1.5 h-1.5 bg-gray-200'
-                        }
+                            flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 snap-x snap-mandatory scroll-smooth
+                            ${specialMeals.length === 1 ? 'md:justify-center md:overflow-x-visible md:mx-0 md:px-0 md:snap-none' : ''}
+                            ${specialMeals.length === 2 ? 'md:grid md:grid-cols-2 md:overflow-x-visible md:mx-0 md:px-0 md:snap-none' : ''}
+                            ${specialMeals.length >= 3 ? 'md:snap-x md:snap-mandatory' : ''}
                         `}
-                    />
-                    ))}
+                    >
+                        {specialMeals.map((meal) => (
+                            <div
+                                key={meal.id}
+                                onClick={() => handleSelectProduct({
+                                    id: meal.id,
+                                    name: meal.name,
+                                    description: meal.description,
+                                    price: meal.price,
+                                    category: 'Special',
+                                    image: meal.image,
+                                    isAvailable: true
+                                })}
+                                className={`
+                                    bg-white border border-gray-100 rounded-2xl p-4 shadow-sm 
+                                    active:scale-[0.98] transition-all duration-200 cursor-pointer 
+                                    flex items-center gap-4 hover:border-[#D57479] hover:shadow-md 
+                                    snap-start shrink-0 group
+                                    ${specialMeals.length === 1 ? 'w-[100%] md:w-[450px] lg:w-[500px]' : ''}
+                                    ${specialMeals.length === 2 ? 'w-[85%] md:w-full' : ''}
+                                    ${specialMeals.length >= 3 ? 'w-[280px] sm:w-[320px] lg:w-[350px]' : ''}
+                                `}
+                            >
+                                <div className="relative shrink-0">
+                                    {meal.image ? (
+                                        <img
+                                            src={meal.image}
+                                            alt={meal.name}
+                                            className={`
+                                                rounded-xl object-cover border border-gray-100 shadow-sm
+                                                transition-transform duration-200 group-hover:scale-105
+                                                ${specialMeals.length === 1 ? 'w-24 h-24 md:w-28 md:h-28' : 'w-16 h-16'}
+                                            `}
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div className={`
+                                            bg-[#F2C1C1]/20 rounded-xl flex items-center justify-center
+                                            ${specialMeals.length === 1 ? 'w-24 h-24 md:w-28 md:h-28' : 'w-16 h-16'}
+                                        `}>
+                                            <Utensils size={specialMeals.length === 1 ? 36 : 24} className="text-[#D57479]" />
+                                        </div>
+                                    )}
+                                    <span className="absolute -top-1.5 -right-1.5 bg-[#D57479] text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-sm">
+                                        ★
+                                    </span>
+                                </div>
+
+                                <div className="flex flex-col flex-1 min-w-0">
+                                    <span className="text-[10px] text-[#D57479] font-black uppercase tracking-wider mb-0.5">
+                                        Daily Special
+                                    </span>
+                                    <h3 className={`
+                                        font-black text-gray-800 leading-tight line-clamp-1
+                                        ${specialMeals.length === 1 ? 'text-base md:text-lg' : 'text-sm'}
+                                    `}>
+                                        {meal.name}
+                                    </h3>
+                                    {meal.description && specialMeals.length === 1 && (
+                                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2 hidden md:block">
+                                            {meal.description}
+                                        </p>
+                                    )}
+                                    <span className={`
+                                        font-black text-gray-800 mt-1
+                                        ${specialMeals.length === 1 ? 'text-lg md:text-xl' : 'text-sm'}
+                                    `}>
+                                        ${meal.price.toLocaleString()}
+                                    </span>
+                                </div>
+
+                                <div className="pr-1">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddToCart({
+                                                id: meal.id,
+                                                name: meal.name,
+                                                description: meal.description,
+                                                price: meal.price,
+                                                category: 'Special',
+                                                image: meal.image,
+                                                isAvailable: true
+                                            });
+                                        }}
+                                        className={`
+                                            rounded-full bg-[#D57479] text-white 
+                                            flex items-center justify-center font-black 
+                                            shadow-md cursor-pointer active:scale-90 
+                                            transition-all hover:bg-[#C4656A] hover:shadow-lg
+                                            ${specialMeals.length === 1 ? 'w-10 h-10 md:w-12 md:h-12 text-lg' : 'w-8 h-8'}
+                                        `}
+                                        aria-label={`Add ${meal.name} to cart`}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {specialMeals.length > 3 && (
+                        <div className="flex justify-center gap-1.5 md:hidden">
+                            {specialMeals.map((_, index) => (
+                                <div 
+                                    key={index}
+                                    className={`
+                                        rounded-full transition-all duration-300
+                                        ${index === 0 ? 'w-4 h-1.5 bg-[#D57479]' : 'w-1.5 h-1.5 bg-gray-200'}
+                                    `}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
-                )}
-            </div>
             )}
 
             <div className="flex items-center gap-2">
-                <button onClick={() => scroll('left')} className="hidden md:flex p-2 bg-white rounded-full shadow-sm text-gray-500 hover:text-brand-primary border border-gray-200">
+                <button onClick={() => scroll('left')} className="hidden md:flex p-2 bg-white rounded-full shadow-sm text-gray-500 hover:text-[#D57479] border border-gray-200">
                     <ChevronLeft size={20} />
                 </button>
 
@@ -293,10 +250,11 @@ export function MenuPage() {
                         <button
                             key={cat.id}
                             onClick={() => setActiveCategory(cat.id)}
-                            className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border flex-shrink-0 ${activeCategory === cat.id
-                                ? 'bg-brand-primary text-white border-brand-primary shadow-md scale-105'
-                                : 'bg-white text-brand-text border-gray-200 hover:border-[#d57479]'
-                                }`}
+                            className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border flex-shrink-0 ${
+                                activeCategory === cat.id
+                                    ? 'bg-[#D57479] text-white border-[#D57479] shadow-md scale-105'
+                                    : 'bg-white text-gray-700 border-gray-200 hover:border-[#D57479]'
+                            }`}
                         >
                             <span>{cat.icon}</span>
                             {cat.name}
@@ -304,20 +262,20 @@ export function MenuPage() {
                     ))}
                 </div>
 
-                <button onClick={() => scroll('right')} className="hidden md:flex p-2 bg-white rounded-full shadow-sm text-gray-500 hover:text-brand-primary border border-gray-200">
+                <button onClick={() => scroll('right')} className="hidden md:flex p-2 bg-white rounded-full shadow-sm text-gray-500 hover:text-[#D57479] border border-gray-200">
                     <ChevronRight size={20} />
                 </button>
             </div>
 
             <div className="space-y-4">
-                <h2 className="text-lg font-black text-brand-text uppercase px-1 border-b-2 border-gray-100 pb-2">
+                <h2 className="text-lg font-black text-gray-800 uppercase px-1 border-b-2 border-gray-100 pb-2">
                     {activeCategory === 'ALL' 
                         ? 'Menú Completo' 
                         : categories.find(c => c.id === activeCategory)?.name || activeCategory}
                 </h2>
 
                 {loading ? (
-                    <div className="text-center py-10 font-bold text-brand-primary">Cargando delicias...</div>
+                    <div className="text-center py-10 font-bold text-[#D57479]">Cargando delicias...</div>
                 ) : filteredProducts.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         {filteredProducts.map(product => (
@@ -353,8 +311,8 @@ export function MenuPage() {
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                                 </>
                             ) : (
-                                <div className="w-full h-full bg-orange-50 flex items-center justify-center">
-                                    <Utensils size={64} className="text-brand-primary/30" />
+                                <div className="w-full h-full bg-[#F2C1C1]/20 flex items-center justify-center">
+                                    <Utensils size={64} className="text-[#D57479]/30" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                                 </div>
                             )}
@@ -379,7 +337,7 @@ export function MenuPage() {
                                     handleAddToCart(selectedProduct);
                                     setSelectedProduct(null);
                                 }}
-                                className="w-full bg-brand-primary text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-orange-200 active:scale-[0.98] transition-all shrink-0"
+                                className="w-full bg-[#D57479] text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-[#F2C1C1]/50 active:scale-[0.98] transition-all shrink-0 hover:bg-[#C4656A]"
                             >
                                 <span className="uppercase tracking-tight text-sm">Añadir al Pedido</span>
                                 <span className="text-xl font-black">${selectedProduct.price?.toLocaleString()}</span>
