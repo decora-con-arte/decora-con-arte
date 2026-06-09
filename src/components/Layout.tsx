@@ -22,49 +22,47 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <ToastProvider>
-    <div className="mx-auto h-full w-full md:max-w-md bg-brand-bg flex flex-col relative md:shadow-2xl md:border-x md:border-gray-200 overflow-hidden">
+    <div className="mx-auto h-full w-full md:max-w-2xl lg:max-w-5xl bg-brand-bg flex flex-col relative md:shadow-2xl md:border-x md:border-gray-200 overflow-hidden">
       
-      <header className="shrink-0 z-50 bg-brand-bg/95 backdrop-blur-md p-4 border-b border-gray-100 flex items-center justify-between shadow-sm">
-        <div className="flex justify-center">
+      <header className="shrink-0 z-50 bg-brand-bg/95 backdrop-blur-md p-4 border-b border-gray-100 flex items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-3 shrink-0">
           <img 
             src="/logo.png" 
             alt="Don Melona Logo" 
-            className="h-15 w-auto object-contain"
+            className="h-12 md:h-14 w-auto object-contain"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="leading-tight">
-            <h1 className="text-xl font-black tracking-tight text-brand-primary uppercase text-center">
+          <div className="hidden md:block leading-tight">
+            <h1 className="text-base md:text-lg font-black tracking-tight text-brand-primary uppercase">
               Sheets Menu SPA
             </h1>
-            <p className="text-[8px] text-brand-text/50 font-bold uppercase tracking-wider text-center">
+            <p className="text-[8px] md:text-[9px] text-brand-text/50 font-bold uppercase tracking-wider">
               An Open Source SPA Menu Project
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-      {loading ? (
-        <div className="bg-gray-100 text-gray-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-200">
-          Checking...
+          {loading ? (
+            <div className="bg-gray-100 text-gray-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-200">
+              Checking...
+            </div>
+          ) : isOpen ? (
+            <div className="bg-brand-accent/10 text-brand-accent text-xs font-bold px-3 py-1 rounded-full animate-pulse border border-brand-accent/20">
+              Open
+            </div>
+          ) : (
+            <div className="bg-red-50 text-red-500 text-xs font-bold px-3 py-1 rounded-full border border-red-100">
+              Closed
+            </div>
+          )}
         </div>
-      ) : isOpen ? (
-        <div className="bg-brand-accent/10 text-brand-accent text-xs font-bold px-3 py-1 rounded-full animate-pulse border border-brand-accent/20">
-          Open
-        </div>
-      ) : (
-        <div className="bg-red-50 text-red-500 text-xs font-bold px-3 py-1 rounded-full border border-red-100">
-          Closed
-        </div>
-      )}
-    </div>
       </header>
 
-      <main className="flex flex-1 min-h-0 flex-col overflow-hidden p-4">
+      <main className="flex flex-1 min-h-0 flex-col overflow-hidden p-4 md:p-6">
         {children}
       </main>
 
       <nav className="app-nav shrink-0 w-full bg-white/90 backdrop-blur-md z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] border-t border-gray-100">
-        <div className="flex h-16 w-full items-center justify-around">
+        <div className="flex h-16 w-full items-center justify-around md:max-w-sm mx-auto">
 
         <button 
           onClick={() => navigate('/')}

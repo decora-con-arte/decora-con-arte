@@ -93,72 +93,188 @@ export function MenuPage() {
 
             <div
                 onClick={() => navigate('/builder')}
-                className="bg-gradient-to-br from-brand-primary to-orange-600 rounded-3xl p-6 shadow-[0_8px_20px_-6px_rgba(249,115,22,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-orange-700"
+                className="bg-gradient-to-br from-brand-primary to-orange-600 rounded-3xl p-6 md:w-full shadow-[0_8px_20px_-6px_rgba(249,115,22,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-orange-700"
             >
                 <div className="relative z-10">
                     <span className="bg-brand-nav text-brand-text text-[10px] font-black uppercase px-2 py-1 rounded-md mb-2 inline-block shadow-sm">Main Product</span>
-                    <h2 className="text-3xl font-black italic text-white drop-shadow-md leading-none mt-1">¡Custom Your<br />Product!</h2>
+                    <h2 className="text-3xl font-black italic text-white drop-shadow-md leading-none mt-1">Custom Your<br />Product!</h2>
                 </div>
                 <span className="absolute -bottom-6 -right-4 text-9xl opacity-20 rotate-12 drop-shadow-2xl">🍔</span>
             </div>
 
             {specialMeals.length > 0 && (
-                <div className="space-y-2">
-                    <span className="text-[10px] text-brand-primary font-black uppercase tracking-wider px-1">Specials</span>
-                    <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 snap-x snap-mandatory scroll-smooth">
-                        {specialMeals.map((meal) => (
-                            <div
-                                key={meal.id}
-                                onClick={() => handleSelectProduct({
-                                    id: meal.id,
-                                    name: meal.name,
-                                    description: meal.description,
-                                    price: meal.price,
-                                    category: 'Especial',
-                                    image: meal.image,
-                                    isAvailable: true
-                                })}
-                                className="bg-white border border-gray-100 rounded-2xl p-3 shadow-sm active:scale-[0.98] transition-all cursor-pointer flex items-center gap-4 hover:border-orange-200 snap-start shrink-0 w-full"
-                            >
-                                {meal.image ? (
-                                    <img
-                                        src={meal.image}
-                                        alt={meal.name}
-                                        className="w-16 h-16 rounded-xl object-cover border border-gray-100 shadow-sm shrink-0"
-                                    />
-                                ) : (
-                                    <div className="w-16 h-16 bg-orange-50 rounded-xl flex items-center justify-center text-brand-primary shrink-0">
-                                        <Utensils size={24} />
-                                    </div>
-                                )}
-                                <div className="flex flex-col flex-1 min-w-0">
-                                    <span className="text-[10px] text-brand-primary font-black uppercase tracking-wider mb-0.5">Daily Special</span>
-                                    <h3 className="font-black text-brand-text text-sm leading-tight line-clamp-1">{meal.name}</h3>
-                                    <span className="font-black text-brand-text text-sm mt-1">${meal.price.toLocaleString()}</span>
-                                </div>
-                                <div className="pr-2">
-                                    <div
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleAddToCart({
-                                                id: meal.id,
-                                                name: meal.name,
-                                                description: meal.description,
-                                                price: meal.price,
-                                                category: 'Especial',
-                                                image: meal.image,
-                                                isAvailable: true
-                                            });
-                                        }}
-                                        className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center font-black shadow-md cursor-pointer active:scale-90 transition-transform"
-                                    >
-                                        +
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+            <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                {specialMeals.length > 3 && (
+                    <span className="text-[10px] text-gray-400 font-medium hidden md:block">
+                    Desliza para ver más →
+                    </span>
+                )}
                 </div>
+
+                <div 
+                className={`
+                    flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 snap-x snap-mandatory scroll-smooth
+                    ${specialMeals.length === 1 
+                    ? 'md:justify-center md:overflow-x-visible md:mx-0 md:px-0 md:snap-none' 
+                    : ''
+                    }
+                    ${specialMeals.length === 2 
+                    ? 'md:grid md:grid-cols-2 md:overflow-x-visible md:mx-0 md:px-0 md:snap-none' 
+                    : ''
+                    }
+                    ${specialMeals.length >= 3 
+                    ? 'md:snap-x md:snap-mandatory' 
+                    : ''
+                    }
+                `}
+                >
+                {specialMeals.map((meal) => (
+                    <div
+                    key={meal.id}
+                    onClick={() => handleSelectProduct({
+                        id: meal.id,
+                        name: meal.name,
+                        description: meal.description,
+                        price: meal.price,
+                        category: 'Special',
+                        image: meal.image,
+                        isAvailable: true
+                    })}
+                    className={`
+                        bg-white border border-gray-100 rounded-2xl p-4 shadow-sm 
+                        active:scale-[0.98] transition-all duration-200 cursor-pointer 
+                        flex items-center gap-4 hover:border-orange-200 hover:shadow-md 
+                        snap-start shrink-0 group
+                        ${specialMeals.length === 1 
+                        ? 'w-[85%] md:w-[450px] lg:w-[500px]'
+                        : ''
+                        }
+                        ${specialMeals.length === 2 
+                        ? 'w-[85%] md:w-full'
+                        : ''
+                        }
+                        ${specialMeals.length >= 3 
+                        ? 'w-[280px] sm:w-[320px] lg:w-[350px]'
+                        : ''
+                        }
+                    `}
+                    >
+                    <div className="relative shrink-0">
+                        {meal.image ? (
+                        <img
+                            src={meal.image}
+                            alt={meal.name}
+                            className={`
+                            rounded-xl object-cover border border-gray-100 shadow-sm
+                            transition-transform duration-200 group-hover:scale-105
+                            ${specialMeals.length === 1 
+                                ? 'w-24 h-24 md:w-28 md:h-28' 
+                                : 'w-16 h-16'
+                            }
+                            `}
+                            loading="lazy"
+                        />
+                        ) : (
+                        <div className={`
+                            bg-orange-50 rounded-xl flex items-center justify-center text-brand-primary
+                            ${specialMeals.length === 1 
+                            ? 'w-24 h-24 md:w-28 md:h-28' 
+                            : 'w-16 h-16'
+                            }
+                        `}>
+                            <Utensils size={specialMeals.length === 1 ? 36 : 24} />
+                        </div>
+                        )}
+
+                        <span className={`
+                        absolute -top-1.5 -right-1.5 bg-brand-primary text-white 
+                        text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-sm
+                        ${specialMeals.length === 1 ? 'md:text-[10px] md:px-2' : ''}
+                        `}>
+                        ★
+                        </span>
+                    </div>
+
+                    <div className="flex flex-col flex-1 min-w-0">
+                        <span className="text-[10px] text-brand-primary font-black uppercase tracking-wider mb-0.5">
+                        Daily Special
+                        </span>
+                        <h3 className={`
+                        font-black text-brand-text leading-tight line-clamp-1
+                        ${specialMeals.length === 1 
+                            ? 'text-base md:text-lg' 
+                            : 'text-sm'
+                        }
+                        `}>
+                        {meal.name}
+                        </h3>
+                        {meal.description && specialMeals.length === 1 && (
+                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2 hidden md:block">
+                            {meal.description}
+                        </p>
+                        )}
+                        <span className={`
+                        font-black text-brand-text mt-1
+                        ${specialMeals.length === 1 
+                            ? 'text-lg md:text-xl' 
+                            : 'text-sm'
+                        }
+                        `}>
+                        ${meal.price.toLocaleString()}
+                        </span>
+                    </div>
+
+                    <div className="pr-1">
+                        <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart({
+                            id: meal.id,
+                            name: meal.name,
+                            description: meal.description,
+                            price: meal.price,
+                            category: 'Special',
+                            image: meal.image,
+                            isAvailable: true
+                            });
+                        }}
+                        className={`
+                            rounded-full bg-brand-primary text-white 
+                            flex items-center justify-center font-black 
+                            shadow-md cursor-pointer active:scale-90 
+                            transition-all hover:bg-orange-600 hover:shadow-lg
+                            ${specialMeals.length === 1 
+                            ? 'w-10 h-10 md:w-12 md:h-12 text-lg' 
+                            : 'w-8 h-8'
+                            }
+                        `}
+                        aria-label={`Add ${meal.name} to cart`}
+                        >
+                        +
+                        </button>
+                    </div>
+                    </div>
+                ))}
+                </div>
+
+                {specialMeals.length > 3 && (
+                <div className="flex justify-center gap-1.5 md:hidden">
+                    {specialMeals.map((_, index) => (
+                    <div 
+                        key={index}
+                        className={`
+                        rounded-full transition-all duration-300
+                        ${index === 0 
+                            ? 'w-4 h-1.5 bg-brand-primary' 
+                            : 'w-1.5 h-1.5 bg-gray-200'
+                        }
+                        `}
+                    />
+                    ))}
+                </div>
+                )}
+            </div>
             )}
 
             <div className="flex items-center gap-2">
@@ -197,7 +313,7 @@ export function MenuPage() {
                 {loading ? (
                     <div className="text-center py-10 font-bold text-brand-primary">Cargando delicias...</div>
                 ) : filteredProducts.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         {filteredProducts.map(product => (
                             <ProductCard
                                 key={product.id}

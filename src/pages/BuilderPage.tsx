@@ -415,7 +415,7 @@ export function BuilderPage() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <div className="p-3 grid grid-cols-1 gap-2">
+                    <div className="p-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                       {group.ingredients.length === 0 && (
                         <p className="text-sm text-gray-400 text-center py-2 font-medium">
                           No ingredients available
