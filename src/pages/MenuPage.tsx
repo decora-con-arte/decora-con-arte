@@ -93,7 +93,7 @@ export function MenuPage() {
 
             <div
                 onClick={() => navigate('/builder')}
-                className="bg-gradient-to-br from-[#F2C1C1] to-[#D57479] rounded-3xl p-6 md:w-full shadow-[0_8px_20px_-6px_rgba(213,116,121,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-[#C4656A] hover:shadow-[0_12px_25px_-6px_rgba(213,116,121,0.6)]"
+                className="bg-gradient-to-br from-[#F2C1C1] to-[#D57479] rounded-3xl p-6 md:w-full shadow-[0_8px_20px_-6px_rgba(213,116,121,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-[#d57479] hover:shadow-[0_12px_25px_-6px_rgba(213,116,121,0.6)]"
             >
                 <div className="relative z-10">
                     <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black uppercase px-2 py-1 rounded-md mb-2 inline-block shadow-sm border border-white/20">
@@ -150,7 +150,7 @@ export function MenuPage() {
                     className={`
                         bg-white border border-gray-100 rounded-2xl p-4 shadow-sm 
                         active:scale-[0.98] transition-all duration-200 cursor-pointer 
-                        flex items-center gap-4 hover:border-orange-200 hover:shadow-md 
+                        flex items-center gap-4 hover:border-[#d57479] hover:shadow-md 
                         snap-start shrink-0 group
                         ${specialMeals.length === 1 
                         ? 'w-[100%] md:w-[450px] lg:w-[500px]'
@@ -295,7 +295,7 @@ export function MenuPage() {
                             onClick={() => setActiveCategory(cat.id)}
                             className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border flex-shrink-0 ${activeCategory === cat.id
                                 ? 'bg-brand-primary text-white border-brand-primary shadow-md scale-105'
-                                : 'bg-white text-brand-text border-gray-200 hover:border-orange-300'
+                                : 'bg-white text-brand-text border-gray-200 hover:border-[#d57479]'
                                 }`}
                         >
                             <span>{cat.icon}</span>
