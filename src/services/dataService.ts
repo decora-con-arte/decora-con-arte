@@ -202,8 +202,8 @@ export const dataService = {
 
       return {
         day: day,
-        startTime: (data['Start Time'] || data.HoraInicio || '00:00').trim(),
-        endTime: (data['End Time'] || data.HoraFin || '23:59').trim(),
+        startTime: (data['Start Time'] || data.HoraInicio  || data['Fecha Inicio'] || '00:00').trim(),
+        endTime: (data['End Time'] || data.HoraFin || data['Fecha Fin'] || '23:59').trim(),
         isOpen: isOpen
       };
     });
@@ -243,7 +243,7 @@ export const dataService = {
         isAvailable,
         isRequired,
         stepOrder: parseInt(data.Order || data.Orden || data.StepOrder || '0') || index + 1,
-        maxFree: parseInt(data.MaxFree || data.Gratis || '0') || 0
+        maxFree: parseInt(data.MaxFree || data.MaxGratis || '0') || 0
       };
     });
   }
