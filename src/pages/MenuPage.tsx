@@ -93,13 +93,19 @@ export function MenuPage() {
 
             <div
                 onClick={() => navigate('/builder')}
-                className="bg-gradient-to-br from-brand-primary to-orange-600 rounded-3xl p-6 md:w-full shadow-[0_8px_20px_-6px_rgba(249,115,22,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-orange-700"
+                className="bg-gradient-to-br from-[#F2C1C1] to-[#D57479] rounded-3xl p-6 md:w-full shadow-[0_8px_20px_-6px_rgba(213,116,121,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-[#C4656A] hover:shadow-[0_12px_25px_-6px_rgba(213,116,121,0.6)]"
             >
                 <div className="relative z-10">
-                    <span className="bg-brand-nav text-brand-text text-[10px] font-black uppercase px-2 py-1 rounded-md mb-2 inline-block shadow-sm">Main Product</span>
-                    <h2 className="text-3xl font-black italic text-white drop-shadow-md leading-none mt-1">Custom Your<br />Product!</h2>
+                    <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black uppercase px-2 py-1 rounded-md mb-2 inline-block shadow-sm border border-white/20">
+                        Producto Personalizado
+                    </span>
+                    <h2 className="text-3xl font-black italic text-white drop-shadow-md leading-none mt-1">
+                        Personaliza Tu<br />Producto!
+                    </h2>
                 </div>
-                <span className="absolute -bottom-6 -right-4 text-9xl opacity-20 rotate-12 drop-shadow-2xl">🍔</span>
+                <span className="absolute -bottom-6 -right-4 text-9xl opacity-20 rotate-12 drop-shadow-2xl">
+                    <img src="/logo_icon.png" alt="Custom Product" className="w-32 h-32 object-contain mb-2 mr-2" />
+                </span>
             </div>
 
             {specialMeals.length > 0 && (
