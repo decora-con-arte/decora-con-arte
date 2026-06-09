@@ -47,14 +47,14 @@ export function Toast({ message, variant = 'success', duration, elevated = false
 
   return (
     <div
-      className={`fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-4 pointer-events-none transition-all duration-300 ease-out
-        ${elevated ? 'bottom-36' : 'bottom-20'}`}
+      className={`fixed inset-x-0 z-[100] w-full md:max-w-2xl lg:max-w-5xl mx-auto px-4 pointer-events-none transition-all duration-300 ease-out
+        ${elevated ? 'bottom-44' : 'bottom-24'}`}
       role="status"
     >
       <button
         type="button"
         onClick={dismiss}
-        className={`relative w-full flex items-start gap-3 p-3.5 bg-white/95 backdrop-blur-md border border-gray-100 rounded-2xl shadow-lg pointer-events-auto overflow-hidden transition-all duration-300
+        className={`relative w-full max-w-md mx-auto flex items-start gap-3 p-3.5 bg-white/95 backdrop-blur-md border border-gray-100 rounded-2xl shadow-lg pointer-events-auto overflow-hidden transition-all duration-300
           ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}
       >
         <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl ${isRemove ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-green-500'}`} />
