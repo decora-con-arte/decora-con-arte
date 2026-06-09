@@ -289,7 +289,7 @@ export function BuilderPage() {
             <ChevronLeft size={24} />
           </button>
           <h2 className="text-xl font-black text-brand-text uppercase italic tracking-tight">
-            Build Your Melona
+            Arma tu Producto
           </h2>
         </div>
 
@@ -297,7 +297,7 @@ export function BuilderPage() {
           <div
             className={`w-32 h-32 rounded-full flex flex-col items-center justify-center transition-all duration-300 ${
               canAdd
-                ? 'border-4 border-brand-primary bg-orange-50/40 shadow-sm'
+                ? 'border-4 border-brand-primary bg-brand-primary/10 shadow-sm'
                 : 'border-4 border-dashed border-gray-200 bg-gray-50'
             }`}
           >
@@ -311,7 +311,7 @@ export function BuilderPage() {
               </div>
             ) : (
               <span className="text-gray-400 text-xs font-bold text-center px-4">
-                {completedRequiredCount}/{requiredCount} required
+                {completedRequiredCount}/{requiredCount} Obligatorio
               </span>
             )}
           </div>
@@ -331,26 +331,26 @@ export function BuilderPage() {
                   isOpen
                     ? 'bg-white border-gray-200 shadow-sm'
                     : hasSelection
-                      ? 'bg-white border-orange-200 shadow-sm'
+                      ? 'bg-white border-brand-primary/40 shadow-sm'
                       : group.isRequired
-                        ? 'bg-white border-amber-200'
+                        ? 'bg-white builder-section--required-pending'
                         : 'bg-white border-gray-100'
                 }`}
               >
                 <button
                   onClick={() => toggleSection(group.category)}
                   className={`w-full flex items-center justify-between p-4 transition-colors duration-300 ${
-                    isOpen ? 'bg-orange-50/50 border-b border-orange-100' : ''
+                    isOpen ? 'bg-brand-primary/[0.06] border-b border-brand-primary/20' : ''
                   }`}
                   aria-expanded={isOpen}
-                  aria-label={`${group.category}${group.isRequired ? ' (required)' : ' (optional)'}${hasSelection ? `, ${selected.length} selected` : ''}`}
+                  aria-label={`${group.category}${group.isRequired ? ' (obligatorio)' : ' (opcional)'}${hasSelection ? `, ${selected.length} seleccionados` : ''}`}
                 >
                   <div className="flex items-center gap-3">
                     <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shadow-sm transition-colors duration-300 shrink-0 ${
                       isOpen || hasSelection
                         ? 'bg-brand-primary text-white'
                         : isPendingRequired
-                          ? 'bg-amber-100 text-amber-600'
+                          ? 'bg-brand-primary/20 text-brand-primary'
                           : 'bg-gray-100 text-brand-text/50'
                     }`}>
                       {index + 1}
@@ -363,16 +363,16 @@ export function BuilderPage() {
                           {group.category}
                         </h3>
                         {hasSelection ? (
-                          <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                            Done
+                          <span className="builder-section-badge builder-section-badge--required-done">
+                            Listo
                           </span>
                         ) : group.isRequired ? (
-                          <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
-                            Required
+                          <span className="builder-section-badge builder-section-badge--required">
+                            Obligatorio
                           </span>
                         ) : (
-                          <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                            Optional
+                          <span className="builder-section-badge builder-section-badge--optional">
+                            Opcional
                           </span>
                         )}
                       </div>
@@ -381,14 +381,14 @@ export function BuilderPage() {
                           hasSelection
                             ? 'text-brand-primary/80'
                             : isPendingRequired
-                              ? 'text-amber-600'
+                              ? 'text-brand-primary'
                               : 'text-brand-text/50'
                         }`}>
                           {hasSelection
                             ? `${selected.length} selected`
                             : group.isRequired
-                              ? 'Select at least one'
-                              : 'Optional'
+                              ? 'Selecciona al menos uno'
+                              : 'Opcional'
                           }
                         </span>
                       )}
@@ -418,7 +418,7 @@ export function BuilderPage() {
                     <div className="p-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                       {group.ingredients.length === 0 && (
                         <p className="text-sm text-gray-400 text-center py-2 font-medium">
-                          No ingredients available
+                          No hay ingredientes disponibles
                         </p>
                       )}
                       {group.ingredients.map((ing) => {
@@ -440,8 +440,8 @@ export function BuilderPage() {
                             onClick={() => toggleSelection(ing.id, group.category)}
                             className={`flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-200 active:scale-[0.98] ${
                               isSelected
-                                ? 'border-brand-primary bg-orange-50 shadow-sm'
-                                : 'border-gray-100 bg-white hover:border-orange-200'
+                                ? 'border-brand-primary bg-brand-primary/10 shadow-sm'
+                                : 'border-gray-100 bg-white hover:border-brand-primary'
                             }`}
                             aria-label={`${ing.name}${isSelected ? ', selected' : ''}${ing.extraPrice > 0 ? `, +$${ing.extraPrice.toLocaleString()}` : ''}`}
                           >
@@ -494,10 +494,10 @@ export function BuilderPage() {
         >
           <span>
             {canAdd
-              ? 'Add to cart'
+              ? 'Agregar al carrito'
               : getFirstPendingRequired()
-                ? `Missing: ${getFirstPendingRequired()?.category}`
-                : 'Complete required sections'
+                ? `Falta: ${getFirstPendingRequired()?.category}`
+                : 'Completa las secciones obligatorias'
             }
           </span>
           <span className="btn-cta__price">
