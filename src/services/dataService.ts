@@ -3,6 +3,14 @@ import type { Category, Product, StoreSchedule, SpecialMeal, Ingredient } from '
 
 const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID;
 
+function normalizeId(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/\s+/g, '-');
+}
+
 const PRODUCTS_GID = import.meta.env.VITE_SHEET_GID_PRODUCTS ?? '0';
 const CATEGORIES_GID = import.meta.env.VITE_SHEET_GID_CATEGORIES;
 const SCHEDULE_GID = import.meta.env.VITE_SHEET_GID_SCHEDULE;
@@ -106,7 +114,7 @@ export const dataService = {
 
       const description = (data.Description || data.Descripción || data.descripción || '').trim();
       const rawCategory = (data.Category || data.Categoría || data.categoría || 'OTRO').trim();
-      const categoryId = rawCategory.toUpperCase().replace(/\s+/g, '-');
+      const categoryId = normalizeId(rawCategory);
 
       return {
         id: safeId,
@@ -126,8 +134,12 @@ export const dataService = {
       
       if (!name) return null; 
 
+      const isAllCategory = (['ALL', 'TODOS', 'TODAS', 'TODO'] as string[]).includes(
+        name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim()
+      );
+
       return {
-        id: name.toUpperCase().replace(/\s+/g, '-'),
+        id: isAllCategory ? 'ALL' : normalizeId(name),
         name: name,
         icon: (data.Icono || data.icono || data.Icon || '📋').trim()
       };
