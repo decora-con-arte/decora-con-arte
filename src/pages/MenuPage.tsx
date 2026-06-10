@@ -101,8 +101,8 @@ export function MenuPage() {
                         Personaliza Tu<br />Producto!
                     </h2>
                 </div>
-                <span className="absolute -bottom-6 -right-4 text-9xl opacity-20 rotate-12 drop-shadow-2xl">
-                    <img src="/logo_icon.png" alt="Custom Product" className="w-32 h-32 object-contain mb-2 mr-2" />
+                <span className="absolute -bottom-6 -right-4 text-9xl opacity-20 drop-shadow-2xl">
+                    <img src="/logo_icon.png" alt="Custom Product" className="w-32 h-32 object-contain mb-2 mr-3" />
                 </span>
             </div>
 
