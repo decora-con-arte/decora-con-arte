@@ -89,6 +89,9 @@ export function MenuPage() {
 
     return (
         <div className="page-scroll -m-4 space-y-6 p-4">
+
+            {/* Comentado temporalmente para enfocarnos en el menú especial diario
+
             <div
                 onClick={() => navigate('/builder')}
                 className="bg-gradient-to-br from-[#F2C1C1] to-[#D57479] rounded-3xl p-6 md:w-full shadow-[0_8px_20px_-6px_rgba(213,116,121,0.5)] relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer border-b-4 border-[#C4656A] hover:shadow-[0_12px_25px_-6px_rgba(213,116,121,0.6)]"
@@ -105,6 +108,7 @@ export function MenuPage() {
                     <img src="/logo_icon.png" alt="Custom Product" className="w-32 h-32 object-contain mb-2 mr-3" />
                 </span>
             </div>
+                */}
 
             {specialMeals.length > 0 && (
                 <div className="space-y-3">
