@@ -3,7 +3,6 @@ import { dataService } from '../services/dataService';
 import { ProductCard } from '../components/ProductCard';
 import type { Product, Category, SpecialMeal } from '../types/models'; 
 import { ChevronLeft, ChevronRight, X, Utensils } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 
@@ -18,9 +17,10 @@ export function MenuPage() {
     const [activeCategory, setActiveCategory] = useState('ALL');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [specialMeals, setSpecialMeals] = useState<SpecialMeal[]>([]);
+    const [modalImgError, setModalImgError] = useState(false);
+    const [mealImgErrors, setMealImgErrors] = useState<Record<string, boolean>>({});
 
     const scrollRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
 
     useEffect(() => {
         async function loadData() {
@@ -70,6 +70,7 @@ export function MenuPage() {
 
     const handleSelectProduct = useCallback((product: Product) => {
         setSelectedProduct(product);
+        setModalImgError(false);
     }, []);
 
     const scroll = (direction: 'left' | 'right') => {
@@ -151,16 +152,17 @@ export function MenuPage() {
                                 `}
                             >
                                 <div className="relative shrink-0">
-                                    {meal.image ? (
+                                    {meal.image && !mealImgErrors[meal.id] ? (
                                         <img
                                             src={meal.image}
                                             alt={meal.name}
                                             className={`
-                                                rounded-xl object-cover border border-gray-100 shadow-sm
+                                                rounded-xl object-contain bg-gray-50 border border-gray-100 shadow-sm
                                                 transition-transform duration-200 group-hover:scale-105
                                                 ${specialMeals.length === 1 ? 'w-24 h-24 md:w-28 md:h-28' : 'w-16 h-16'}
                                             `}
                                             loading="lazy"
+                                            onError={() => setMealImgErrors(prev => ({ ...prev, [meal.id]: true }))}
                                         />
                                     ) : (
                                         <div className={`
@@ -177,7 +179,7 @@ export function MenuPage() {
 
                                 <div className="flex flex-col flex-1 min-w-0">
                                     <span className="text-[10px] text-[#D57479] font-black uppercase tracking-wider mb-0.5">
-                                        Daily Special
+                                        Especial
                                     </span>
                                     <h3 className={`
                                         font-black text-gray-800 leading-tight line-clamp-1
@@ -190,40 +192,44 @@ export function MenuPage() {
                                             {meal.description}
                                         </p>
                                     )}
-                                    <span className={`
-                                        font-black text-gray-800 mt-1
-                                        ${specialMeals.length === 1 ? 'text-lg md:text-xl' : 'text-sm'}
-                                    `}>
-                                        ${meal.price.toLocaleString()}
-                                    </span>
+                                    {meal.price !== 1 && (
+                                        <span className={`
+                                            font-black text-gray-800 mt-1
+                                            ${specialMeals.length === 1 ? 'text-lg md:text-xl' : 'text-sm'}
+                                        `}>
+                                            ${meal.price.toLocaleString()}
+                                        </span>
+                                    )}
                                 </div>
 
-                                <div className="pr-1">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleAddToCart({
-                                                id: meal.id,
-                                                name: meal.name,
-                                                description: meal.description,
-                                                price: meal.price,
-                                                category: 'Special',
-                                                image: meal.image,
-                                                isAvailable: true
-                                            });
-                                        }}
-                                        className={`
-                                            rounded-full bg-[#D57479] text-white 
-                                            flex items-center justify-center font-black 
-                                            shadow-md cursor-pointer active:scale-90 
-                                            transition-all hover:bg-[#C4656A] hover:shadow-lg
-                                            ${specialMeals.length === 1 ? 'w-10 h-10 md:w-12 md:h-12 text-lg' : 'w-8 h-8'}
-                                        `}
-                                        aria-label={`Add ${meal.name} to cart`}
-                                    >
-                                        +
-                                    </button>
-                                </div>
+                                {meal.price !== 1 && (
+                                    <div className="pr-1">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddToCart({
+                                                    id: meal.id,
+                                                    name: meal.name,
+                                                    description: meal.description,
+                                                    price: meal.price,
+                                                    category: 'Especial',
+                                                    image: meal.image,
+                                                    isAvailable: true
+                                                });
+                                            }}
+                                            className={`
+                                                rounded-full bg-[#D57479] text-white 
+                                                flex items-center justify-center font-black 
+                                                shadow-md cursor-pointer active:scale-90 
+                                                transition-all hover:bg-[#C4656A] hover:shadow-lg
+                                                ${specialMeals.length === 1 ? 'w-10 h-10 md:w-12 md:h-12 text-lg' : 'w-8 h-8'}
+                                            `}
+                                            aria-label={`Add ${meal.name} to cart`}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -300,52 +306,61 @@ export function MenuPage() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setSelectedProduct(null)}></div>
 
-                    <div className="relative bg-white w-full md:max-w-md rounded-[2rem] overflow-hidden shadow-2xl z-10 animate-in slide-in-from-bottom-8 fade-in duration-300 flex flex-col max-h-[90vh]">
+                    <div className="relative w-full md:max-w-md max-h-[90vh]">
                         <button
                             onClick={() => setSelectedProduct(null)}
-                            className="absolute top-4 right-4 z-20 bg-black/50 text-white p-2 rounded-full backdrop-blur-md hover:bg-black/70 active:scale-90 transition-all"
+                            className="absolute -top-2 right-4 z-30 bg-black/50 text-white p-2 rounded-full backdrop-blur-md hover:bg-black/70 active:scale-90 transition-all"
                         >
                             <X size={20} strokeWidth={3} />
                         </button>
 
-                        <div className="w-full h-64 bg-gray-100 relative shrink-0">
-                            {selectedProduct.image && (selectedProduct.image.startsWith('http') || selectedProduct.image.startsWith('https')) ? (
-                                <>
-                                    <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                                </>
-                            ) : (
-                                <div className="w-full h-full bg-[#F2C1C1]/20 flex items-center justify-center">
-                                    <Utensils size={64} className="text-[#D57479]/30" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                        <div className="bg-white rounded-[2rem] overflow-y-auto shadow-2xl max-h-[90vh]">
+                            <div className="w-full bg-[#F2C1C1]/10 relative">
+                                {selectedProduct.image?.startsWith('http') && !modalImgError ? (
+                                    <>
+                                        <img
+                                            src={selectedProduct.image}
+                                            alt={selectedProduct.name}
+                                            className="w-full block"
+                                            onError={() => setModalImgError(true)}
+                                        />
+                                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
+                                    </>
+                                ) : (
+                                    <div className="w-full min-h-[200px] bg-[#F2C1C1]/20 flex items-center justify-center">
+                                        <Utensils size={64} className="text-[#D57479]/30" />
+                                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
+                                    </div>
+                                )}
+
+                                <div className="absolute bottom-4 left-4 right-4 text-left">
+                                    <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-white/30">
+                                        {selectedProduct.category}
+                                    </span>
+                                    <h2 className="text-white text-2xl sm:text-3xl font-black mt-1.5 leading-tight drop-shadow-md">
+                                        {selectedProduct.name}
+                                    </h2>
                                 </div>
-                            )}
-
-                            <div className="absolute bottom-4 left-4 right-4 text-left">
-                                <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-white/30">
-                                    {selectedProduct.category}
-                                </span>
-                                <h2 className="text-white text-3xl font-black mt-2 leading-tight drop-shadow-md">
-                                    {selectedProduct.name}
-                                </h2>
                             </div>
-                        </div>
 
-                        <div className="p-6 space-y-6 overflow-y-auto">
-                            <p className="text-gray-600 text-sm font-medium leading-relaxed">
-                                {selectedProduct.description || "Sin descripción detallada."}
-                            </p>
+                            <div className="p-6 space-y-6">
+                                <p className="text-gray-600 text-sm font-medium leading-relaxed">
+                                    {selectedProduct.description || "Sin descripción detallada."}
+                                </p>
 
-                            <button
-                                onClick={() => {
-                                    handleAddToCart(selectedProduct);
-                                    setSelectedProduct(null);
-                                }}
-                                className="w-full bg-[#D57479] text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-[#F2C1C1]/50 active:scale-[0.98] transition-all shrink-0 hover:bg-[#C4656A]"
-                            >
-                                <span className="uppercase tracking-tight text-sm">Añadir al Pedido</span>
-                                <span className="text-xl font-black">${selectedProduct.price?.toLocaleString()}</span>
-                            </button>
+                                {selectedProduct.price !== 1 && (
+                                    <button
+                                        onClick={() => {
+                                            handleAddToCart(selectedProduct);
+                                            setSelectedProduct(null);
+                                        }}
+                                        className="w-full bg-[#D57479] text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-[#F2C1C1]/50 active:scale-[0.98] transition-all shrink-0 hover:bg-[#C4656A]"
+                                    >
+                                        <span className="uppercase tracking-tight text-sm">Añadir al Pedido</span>
+                                        <span className="text-xl font-black">${selectedProduct.price?.toLocaleString()}</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

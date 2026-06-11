@@ -47,7 +47,7 @@ export function Toast({ message, variant = 'success', duration, elevated = false
 
   return (
     <div
-      className={`fixed inset-x-0 z-[100] w-full md:max-w-2xl lg:max-w-5xl mx-auto px-4 pointer-events-none transition-all duration-300 ease-out
+      className={`fixed inset-x-0 z-[200] w-full md:max-w-2xl lg:max-w-5xl mx-auto px-4 pointer-events-none transition-all duration-300 ease-out
         ${elevated ? 'bottom-44' : 'bottom-24'}`}
       role="status"
     >

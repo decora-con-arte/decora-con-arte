@@ -50,7 +50,7 @@ export const ProductCard = memo(function ProductCard({ product, onSelect, onAddT
           <img 
             src={product.image} 
             alt={product.name} 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain bg-gray-50"
             loading="lazy"
             onError={() => setImgError(true)}
           />
