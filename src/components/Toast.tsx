@@ -54,7 +54,7 @@ export function Toast({ message, variant = 'success', duration, elevated = false
       <button
         type="button"
         onClick={dismiss}
-        className={`relative w-full max-w-md mx-auto flex items-start gap-3 p-3.5 bg-white/95 backdrop-blur-md border border-gray-100 rounded-2xl shadow-lg pointer-events-auto overflow-hidden transition-all duration-300
+        className={`relative w-full max-w-md mx-auto flex items-start gap-3 p-3.5 bg-white/95 backdrop-blur-md border border-gray-100 rounded-2xl shadow-lg pointer-events-auto overflow-hidden max-sm:max-h-[35vh] max-sm:overflow-y-auto transition-all duration-300
           ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}
       >
         <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl ${isRemove ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-green-500'}`} />

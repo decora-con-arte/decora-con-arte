@@ -306,7 +306,7 @@ export function MenuPage() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setSelectedProduct(null)}></div>
 
-                    <div className="relative w-full md:max-w-md max-h-[90vh]">
+                    <div className="relative w-full md:max-w-md max-h-[72vh]">
                         <button
                             onClick={() => setSelectedProduct(null)}
                             className="absolute -top-2 right-4 z-30 bg-black/50 text-white p-2 rounded-full backdrop-blur-md hover:bg-black/70 active:scale-90 transition-all"
@@ -314,7 +314,7 @@ export function MenuPage() {
                             <X size={20} strokeWidth={3} />
                         </button>
 
-                        <div className="bg-white rounded-[2rem] overflow-y-auto shadow-2xl max-h-[90vh]">
+                        <div className="bg-white rounded-[2rem] overflow-y-auto shadow-2xl max-h-[72vh]">
                             <div className="w-full bg-[#F2C1C1]/10 relative">
                                 {selectedProduct.image?.startsWith('http') && !modalImgError ? (
                                     <>
