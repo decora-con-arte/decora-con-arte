@@ -280,12 +280,12 @@ export function MenuPage() {
             <div className="space-y-4">
                 <h2 className="text-lg font-black text-gray-800 uppercase px-1 border-b-2 border-gray-100 pb-2">
                     {activeCategory === 'ALL' 
-                        ? 'Menú Completo' 
+                        ? 'Productos' 
                         : categories.find(c => c.id === activeCategory)?.name || activeCategory}
                 </h2>
 
                 {loading ? (
-                    <div className="text-center py-10 font-bold text-[#D57479]">Cargando delicias...</div>
+                    <div className="text-center py-10 font-bold text-[#D57479]">Cargando productos...</div>
                 ) : filteredProducts.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         {filteredProducts.map(product => (
