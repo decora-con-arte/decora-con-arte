@@ -2,7 +2,7 @@ import React from 'react';
 import { useCart } from '../context/CartContext';
 import { ToastProvider } from '../context/ToastContext';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Utensils, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useStoreStatus } from '../hooks/useStoreStatus';
 
 interface LayoutProps {
@@ -74,12 +74,12 @@ export function Layout({ children }: LayoutProps) {
               : 'text-gray-400 hover:text-brand-text font-medium'
             }`}
         >
-          <Utensils 
-            size={20} 
-            strokeWidth={isMenu ? 3 : 2} 
-            className={`transition-transform ${isMenu ? 'scale-110' : ''}`}
+          <img 
+            src="/icon.png" 
+            alt="Menú"
+            className={`h-5 w-auto object-contain transition-transform ${isMenu ? 'scale-110' : ''}`}
           />
-          <span className="text-[11px] tracking-tight">Menú</span>
+          <span className="text-[11px] tracking-tight">Inicio</span>
         </button>
         
         <div className="w-px h-6 bg-gray-200/60"></div>
