@@ -83,10 +83,26 @@ export function MenuPage() {
         }
     };
 
-    const filteredProducts = useMemo(() => products.filter(product => {
-        if (activeCategory === 'ALL') return true;
-        return product.category === activeCategory;
-    }), [products, activeCategory]);
+    const filteredProducts = useMemo(() => {
+        const filtered = products.filter(product => {
+            if (activeCategory === 'ALL') return true;
+            return product.category === activeCategory;
+        });
+
+        if (activeCategory === 'ALL') {
+            const categoryOrder = new Map<string, number>();
+            categories.forEach((cat, index) => {
+                categoryOrder.set(cat.id, index);
+            });
+            return [...filtered].sort((a, b) => {
+                const orderA = categoryOrder.get(a.category) ?? Infinity;
+                const orderB = categoryOrder.get(b.category) ?? Infinity;
+                return orderA - orderB;
+            });
+        }
+
+        return filtered;
+    }, [products, activeCategory, categories]);
 
     return (
         <div className="page-scroll -m-4 space-y-6 p-4">
