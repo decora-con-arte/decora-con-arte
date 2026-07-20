@@ -17,7 +17,7 @@ export function Layout({ children }: LayoutProps) {
 
   const isMenu = location.pathname === '/' || location.pathname === '/builder';
   const isCart = location.pathname === '/cart';
-  const isAuth = location.pathname === '/login' || location.pathname === '/admin';
+  const isAuth = location.pathname.startsWith('/login') || location.pathname.startsWith('/admin');
 
   const { isOpen, loading } = useStoreStatus();
 
