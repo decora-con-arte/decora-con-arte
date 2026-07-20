@@ -221,7 +221,7 @@ export function AdminProductos() {
   }
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 overflow-y-auto">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <button
