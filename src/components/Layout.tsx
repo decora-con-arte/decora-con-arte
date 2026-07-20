@@ -17,6 +17,7 @@ export function Layout({ children }: LayoutProps) {
 
   const isMenu = location.pathname === '/' || location.pathname === '/builder';
   const isCart = location.pathname === '/cart';
+  const isAuth = location.pathname === '/login' || location.pathname === '/admin';
 
   const { isOpen, loading } = useStoreStatus();
 
@@ -63,56 +64,58 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
 
-      <nav className="app-nav shrink-0 w-full bg-white/90 backdrop-blur-md z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] border-t border-gray-100">
-        <div className="flex h-16 w-full items-center justify-around md:max-w-sm mx-auto">
+      {!isAuth && (
+        <nav className="app-nav shrink-0 w-full bg-white/90 backdrop-blur-md z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] border-t border-gray-100">
+          <div className="flex h-16 w-full items-center justify-around md:max-w-sm mx-auto">
 
-        <button 
-          onClick={() => navigate('/')}
-          className={`flex-1 flex flex-col items-center justify-center gap-1 h-full transition-all duration-200 active:scale-95
-            ${isMenu 
-              ? 'text-brand-primary font-black' 
-              : 'text-gray-400 hover:text-brand-text font-medium'
-            }`}
-        >
-          <img 
-            src="/icon.png" 
-            alt="Menú"
-            className={`h-5 w-auto object-contain transition-transform ${isMenu ? 'scale-110' : ''}`}
-          />
-          <span className="text-[11px] tracking-tight">Inicio</span>
-        </button>
-        
-        <div className="w-px h-6 bg-gray-200/60"></div>
-        
-        <button 
-          onClick={() => navigate('/cart')}
-          className={`flex-1 flex flex-col items-center justify-center gap-1 h-full relative transition-all duration-200 active:scale-95
-            ${isCart 
-              ? 'text-brand-primary font-black' 
-              : 'text-gray-400 hover:text-brand-text font-medium'
-            }`}
-        >
-          {totalItems > 0 && (
-            <div className={`absolute top-1.5 right-[33%] text-[10px] font-black h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center shadow-sm border transition-all duration-300
-              ${totalItems > 0 
-                ? 'bg-brand-primary text-white border-brand-primary animate-bounce' 
-                : 'bg-gray-100 text-gray-400 border-gray-200'
+          <button 
+            onClick={() => navigate('/')}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 h-full transition-all duration-200 active:scale-95
+              ${isMenu 
+                ? 'text-brand-primary font-black' 
+                : 'text-gray-400 hover:text-brand-text font-medium'
               }`}
           >
-            {totalItems}
+            <img 
+              src="/icon.png" 
+              alt="Menú"
+              className={`h-5 w-auto object-contain transition-transform ${isMenu ? 'scale-110' : ''}`}
+            />
+            <span className="text-[11px] tracking-tight">Inicio</span>
+          </button>
+          
+          <div className="w-px h-6 bg-gray-200/60"></div>
+          
+          <button 
+            onClick={() => navigate('/cart')}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 h-full relative transition-all duration-200 active:scale-95
+              ${isCart 
+                ? 'text-brand-primary font-black' 
+                : 'text-gray-400 hover:text-brand-text font-medium'
+              }`}
+          >
+            {totalItems > 0 && (
+              <div className={`absolute top-1.5 right-[33%] text-[10px] font-black h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center shadow-sm border transition-all duration-300
+                ${totalItems > 0 
+                  ? 'bg-brand-primary text-white border-brand-primary animate-bounce' 
+                  : 'bg-gray-100 text-gray-400 border-gray-200'
+                }`}
+            >
+              {totalItems}
+            </div>
+            )}
+
+            <ShoppingCart 
+              size={20} 
+              strokeWidth={isCart ? 3 : 2} 
+              className={`transition-transform ${isCart ? 'scale-110' : ''}`}
+            />
+            <span className="text-[11px] tracking-tight">Carrito</span>
+          </button>
+
           </div>
-          )}
-
-          <ShoppingCart 
-            size={20} 
-            strokeWidth={isCart ? 3 : 2} 
-            className={`transition-transform ${isCart ? 'scale-110' : ''}`}
-          />
-          <span className="text-[11px] tracking-tight">Carrito</span>
-        </button>
-
-        </div>
-      </nav>
+        </nav>
+      )}
     </div>
     </ToastProvider>
   );
