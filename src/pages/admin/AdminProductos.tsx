@@ -4,6 +4,7 @@ import { supabase } from '../../services/supabaseClient';
 import { storageService } from '../../services/storageService';
 import { ProductForm } from '../../components/admin/ProductForm';
 import { Loader2, ChevronLeft, Plus, Image as ImageIcon, Edit3, Trash2, AlertCircle } from 'lucide-react';
+import { Toast, type ToastVariant } from '../../components/Toast';
 import type { PostgrestError } from '@supabase/supabase-js';
 
 interface ProductRow {
@@ -55,6 +56,8 @@ export function AdminProductos() {
   const [saving, setSaving] = useState(false);
 
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ message: string; variant: ToastVariant } | null>(null);
+  const [toastKey, setToastKey] = useState(0);
   const mountedRef = useRef(true);
 
   const fetchProducts = useCallback(async () => {
@@ -151,9 +154,15 @@ export function AdminProductos() {
         if (insertErr) throw insertErr;
       }
 
+      const wasEditing = !!editingProduct;
       setShowForm(false);
       setEditingProduct(null);
       await fetchProducts();
+      setToast({
+        message: wasEditing ? `Producto actualizado — ${formData.nombre}` : `Producto creado — ${formData.nombre}`,
+        variant: 'success',
+      });
+      setToastKey(k => k + 1);
     } catch (err) {
       const message = (err as PostgrestError | Error).message || 'Error al guardar el producto';
       console.error('Error saving product:', err);
@@ -180,6 +189,11 @@ export function AdminProductos() {
 
         setDeletingId(null);
         await fetchProducts();
+        setToast({
+          message: `Producto eliminado — ${product.nombre}`,
+          variant: 'remove',
+        });
+        setToastKey(k => k + 1);
       } catch (err) {
         const message = (err as PostgrestError | Error).message || 'Error al eliminar el producto';
         console.error('Error deleting product:', err);
@@ -221,7 +235,7 @@ export function AdminProductos() {
   }
 
   return (
-    <div className="flex flex-col flex-1 overflow-y-auto">
+    <div className="flex flex-col flex-1 overflow-y-auto pr-0.5">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <button
@@ -345,6 +359,16 @@ export function AdminProductos() {
             </div>
           ))}
         </div>
+      )}
+
+      {toast && (
+        <Toast
+          key={toastKey}
+          message={toast.message}
+          variant={toast.variant}
+          duration={3000}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
