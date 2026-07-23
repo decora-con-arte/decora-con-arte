@@ -34,7 +34,7 @@ interface ProductFormProps {
 export function ProductForm({ categories, initial, saving, onSave, onCancel }: ProductFormProps) {
   const [nombre, setNombre] = useState(initial?.nombre ?? '');
   const [descripcion, setDescripcion] = useState(initial?.descripcion ?? '');
-  const [precio, setPrecio] = useState(initial?.precio ?? '');
+  const [precio, setPrecio] = useState(initial?.precio ? Number(initial.precio).toLocaleString('en-US') : '');
   const [categoriaId, setCategoriaId] = useState(initial?.categoria_id ?? '');
   const [disponibilidad, setDisponibilidad] = useState(initial?.disponibilidad ?? true);
   const [file, setFile] = useState<File | null>(null);
@@ -74,21 +74,22 @@ export function ProductForm({ categories, initial, saving, onSave, onCancel }: P
       return;
     }
 
-    const price = Number(precio);
-    if (!precio || isNaN(price) || price < 0 || price > 1000000) {
+    const cleanPrecio = precio.replace(/,/g, '');
+    const price = Number(cleanPrecio);
+    if (!cleanPrecio || isNaN(price) || price < 0 || price > 1000000) {
       setError('El precio debe estar entre 0 y 1,000,000');
       return;
     }
 
-    onSave({
-      nombre: trimmedName,
-      descripcion: descripcion.trim(),
-      precio: price,
-      categoria_id: categoriaId,
-      disponibilidad,
-      file: file ?? undefined,
-      removeImage,
-    });
+      onSave({
+        nombre: trimmedName,
+        descripcion: descripcion.trim(),
+        precio: Number(cleanPrecio),
+        categoria_id: categoriaId,
+        disponibilidad,
+        file: file ?? undefined,
+        removeImage,
+      });
   };
 
   const labelClass = 'block text-xs font-black uppercase tracking-widest text-gray-400 mb-2';
@@ -126,11 +127,14 @@ export function ProductForm({ categories, initial, saving, onSave, onCancel }: P
           <label htmlFor="prod-precio" className={labelClass}>Precio ($)</label>
           <input
             id="prod-precio"
-            type="number"
-            min={0}
-            max={1000000}
+            type="text"
+            inputMode="numeric"
             value={precio}
-            onChange={(e) => { setPrecio(e.target.value); setError(''); }}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, '');
+              setPrecio(digits ? Number(digits).toLocaleString('en-US') : '');
+              setError('');
+            }}
             placeholder="0"
             className={inputClass}
           />
