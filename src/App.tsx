@@ -7,6 +7,7 @@ import { CartPage } from './pages/CartPage';
 import { LoginPage } from './pages/LoginPage';
 import { AdminPage } from './pages/AdminPage';
 import { AdminProductos } from './pages/admin/AdminProductos';
+import { AdminCategorias } from './pages/admin/AdminCategorias';
 
 export function App() {
   return (
@@ -20,6 +21,7 @@ export function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/productos" element={<AdminProductos />} />
+            <Route path="/admin/categorias" element={<AdminCategorias />} />
           </Routes>
         </Layout>
       </BrowserRouter>

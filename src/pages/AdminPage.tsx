@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
-import { Loader2, LogOut, ShieldCheck, Package } from 'lucide-react';
+import { Loader2, LogOut, ShieldCheck, Package, Tags } from 'lucide-react';
 import { AdminCard } from '../components/AdminCard';
 
 export function AdminPage() {
@@ -68,6 +68,12 @@ export function AdminPage() {
           title="Productos"
           description="Gestionar el catálogo de productos"
           onClick={() => navigate('/admin/productos')}
+        />
+        <AdminCard
+          icon={Tags}
+          title="Categorías"
+          description="Gestionar las categorías de productos"
+          onClick={() => navigate('/admin/categorias')}
         />
       </div>
     </div>
