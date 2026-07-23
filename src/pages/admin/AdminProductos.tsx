@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../services/supabaseClient';
+import { getSupabase } from '../../services/supabaseClient';
 import { storageService } from '../../services/storageService';
 import { ProductForm } from '../../components/admin/ProductForm';
 import { Loader2, ChevronLeft, Plus, Image as ImageIcon, Edit3, Trash2, AlertCircle } from 'lucide-react';
@@ -61,6 +61,7 @@ export function AdminProductos() {
   const mountedRef = useRef(true);
 
   const fetchProducts = useCallback(async () => {
+    const supabase = getSupabase()
     const { data, error: err } = await supabase
       .from('productos')
       .select('*, categorias(nombre)')
@@ -75,6 +76,7 @@ export function AdminProductos() {
   }, []);
 
   const fetchCategories = useCallback(async () => {
+    const supabase = getSupabase()
     const { data, error: err } = await supabase
       .from('categorias')
       .select('id, nombre')
@@ -121,6 +123,7 @@ export function AdminProductos() {
         imageUrl = await storageService.upload(formData.file, slug);
       }
 
+      const supabase = getSupabase()
       const categoriaId = formData.categoria_id ? Number(formData.categoria_id) : null;
 
       if (editingProduct) {
@@ -176,6 +179,7 @@ export function AdminProductos() {
     if (deletingId === product.id) {
       setSaving(true);
       try {
+        const supabase = getSupabase()
         if (product.img_path) {
           await storageService.remove(product.img_path);
         }

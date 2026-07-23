@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../services/supabaseClient';
+import { getSupabase } from '../services/supabaseClient';
 import { Mail, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 
 export function LoginPage() {
@@ -13,21 +13,27 @@ export function LoginPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate('/admin', { replace: true });
-        return;
-      }
+    try {
+      const supabase = getSupabase();
+
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          navigate('/admin', { replace: true });
+          return;
+        }
+        setChecking(false);
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session) {
+          navigate('/admin', { replace: true });
+        }
+      });
+
+      return () => subscription.unsubscribe();
+    } catch {
       setChecking(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        navigate('/admin', { replace: true });
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    }
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,18 +48,24 @@ export function LoginPage() {
 
     setLoading(true);
 
-    const { error: signInError } = await supabase.auth.signInWithOtp({
-      email: trimmed,
-      options: {
-        emailRedirectTo: `${window.location.origin}/admin`,
-      },
-    });
+    try {
+      const supabase = getSupabase();
 
-    if (signInError) {
-      setError('No se pudo enviar el enlace. Intenta de nuevo.');
-      console.error(signInError);
-    } else {
-      setSent(true);
+      const { error: signInError } = await supabase.auth.signInWithOtp({
+        email: trimmed,
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin`,
+        },
+      });
+
+      if (signInError) {
+        setError('No se pudo enviar el enlace. Intenta de nuevo.');
+        console.error(signInError);
+      } else {
+        setSent(true);
+      }
+    } catch {
+      setError('Error de configuración. Contacta al administrador.');
     }
 
     setLoading(false);

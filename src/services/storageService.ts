@@ -1,9 +1,10 @@
-import { supabase } from './supabaseClient';
+import { getSupabase } from './supabaseClient';
 
 const BUCKET = 'products_img';
 
 export const storageService = {
   upload: async (file: File, folder: string): Promise<string> => {
+    const supabase = getSupabase()
     const ext = file.name.split('.').pop();
     const filePath = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
@@ -19,6 +20,7 @@ export const storageService = {
   },
 
   remove: async (imageUrl: string): Promise<void> => {
+    const supabase = getSupabase()
     const baseUrl = supabase.storage.from(BUCKET).getPublicUrl('').data.publicUrl.replace(/\/?$/, '/');
     const path = imageUrl.replace(baseUrl, '');
     if (!path || path === imageUrl) return;

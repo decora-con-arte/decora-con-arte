@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../services/supabaseClient';
+import { getSupabase } from '../../services/supabaseClient';
 import { CategoryForm } from '../../components/admin/CategoryForm';
 import type { CategoryFormPayload } from '../../components/admin/CategoryForm';
 import { Loader2, ChevronLeft, Plus, Hash, Edit3, Trash2, AlertCircle } from 'lucide-react';
@@ -40,6 +40,7 @@ export function AdminCategorias() {
   const mountedRef = useRef(true);
 
   const fetchCategories = useCallback(async () => {
+    const supabase = getSupabase()
     const { data, error: err } = await supabase
       .from('categorias')
       .select('*')
@@ -75,6 +76,7 @@ export function AdminCategorias() {
     const slug = editingCategory?.slug ?? slugify(formData.nombre);
 
     try {
+      const supabase = getSupabase()
       if (editingCategory) {
         const { error: updateErr } = await supabase
           .from('categorias')
@@ -120,6 +122,7 @@ export function AdminCategorias() {
     if (deletingId === category.id) {
       setSaving(true);
       try {
+        const supabase = getSupabase()
         const { error: delErr } = await supabase
           .from('categorias')
           .delete()

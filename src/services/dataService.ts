@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { getSupabase } from './supabaseClient';
 import type { Category, Product, StoreSchedule, SpecialMeal, Ingredient } from '../types/models';
 
 const SPECIALS_LIMIT = Number(import.meta.env.VITE_SPECIALS_LIMIT) || 5;
@@ -27,6 +27,7 @@ function formatTime(time: string): string {
 export const dataService = {
 
   getProducts: async (): Promise<Product[]> => {
+    const supabase = getSupabase()
     const { data: rows, error } = await supabase
       .from('productos')
       .select('slug, nombre, descripcion, precio, img_path, disponibilidad, categorias(slug)')
@@ -49,6 +50,7 @@ export const dataService = {
   },
 
   getCategories: async (): Promise<Category[]> => {
+    const supabase = getSupabase()
     const { data: rows, error } = await supabase
       .from('categorias')
       .select('nombre, icono, slug')
@@ -76,6 +78,7 @@ export const dataService = {
   getSpecialMeals: async (): Promise<SpecialMeal[]> => {
     const now = new Date().toISOString();
 
+    const supabase = getSupabase()
     const { data: rows, error } = await supabase
       .from('productos_especiales')
       .select('*')
@@ -103,6 +106,7 @@ export const dataService = {
   },
 
   getSchedule: async (): Promise<StoreSchedule[]> => {
+    const supabase = getSupabase()
     const { data: rows, error } = await supabase
       .from('horarios')
       .select('dia, hora_inicio, hora_fin, abierto')
@@ -122,6 +126,7 @@ export const dataService = {
   },
 
   getIngredients: async (): Promise<Ingredient[]> => {
+    const supabase = getSupabase()
     const { data: rows, error } = await supabase
       .from('ingredientes')
       .select('nombre, precio_extra, disponible, obligatorio, step_order, max_gratis, categorias(nombre)')
