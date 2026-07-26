@@ -4,9 +4,9 @@ import { dataService } from '../services/dataService';
 function getBogotaTime() {
   const now = new Date();
   
-  const parts = new Intl.DateTimeFormat('en-US', {
+  const parts = new Intl.DateTimeFormat('es-ES', {
     timeZone: 'America/Bogota',
-    weekday: 'long', 
+    weekday: 'long',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,

@@ -20,8 +20,8 @@ function generateSlug(value: string): string {
     .replace(/^-|-$/g, '');
 }
 
-function formatTime(time: string): string {
-  return time.slice(0, 5);
+function formatTime(time: string | null | undefined): string {
+  return (time || '00:00').slice(0, 5);
 }
 
 export const dataService = {

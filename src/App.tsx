@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage';
 import { AdminPage } from './pages/AdminPage';
 import { AdminProductos } from './pages/admin/AdminProductos';
 import { AdminCategorias } from './pages/admin/AdminCategorias';
+import { AdminHorarios } from './pages/admin/AdminHorarios';
 
 export function App() {
   return (
@@ -22,6 +23,7 @@ export function App() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/productos" element={<AdminProductos />} />
             <Route path="/admin/categorias" element={<AdminCategorias />} />
+            <Route path="/admin/horarios" element={<AdminHorarios />} />
           </Routes>
         </Layout>
       </BrowserRouter>
