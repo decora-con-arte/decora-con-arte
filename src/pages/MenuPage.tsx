@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { dataService } from '../services/dataService'; 
 import { ProductCard } from '../components/ProductCard';
-import type { Product, Category, SpecialMeal, StoreSchedule } from '../types/models'; 
+import type { Product, Category, SpecialMeal } from '../types/models'; 
 import { ChevronLeft, ChevronRight, X, Utensils } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
@@ -17,7 +17,6 @@ export function MenuPage() {
     const [activeCategory, setActiveCategory] = useState('ALL');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [specialMeals, setSpecialMeals] = useState<SpecialMeal[]>([]);
-    const [schedule, setSchedule] = useState<StoreSchedule[]>([]);
     const [modalImgError, setModalImgError] = useState(false);
     const [isPortrait, setIsPortrait] = useState(false);
     const [mealImgErrors, setMealImgErrors] = useState<Record<string, boolean>>({});
@@ -27,15 +26,13 @@ export function MenuPage() {
     useEffect(() => {
         async function loadData() {
             try {
-                const [productsData, categoriesData, specialsData, scheduleData] = await Promise.all([
+                const [productsData, categoriesData, specialsData] = await Promise.all([
                     dataService.getProducts(),
                     dataService.getCategories(),
                     dataService.getSpecialMeals(),
-                    dataService.getSchedule()
                 ]);
 
                 setSpecialMeals(specialsData);
-                setSchedule(scheduleData);
                 setProducts(productsData.filter(p => p.isAvailable));
 
                 const hasAllCategory = categoriesData.some(c => c.id === 'ALL');

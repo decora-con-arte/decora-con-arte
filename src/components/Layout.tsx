@@ -48,14 +48,17 @@ export function Layout({ children }: LayoutProps) {
             <div className="bg-gray-100 text-gray-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-200">
                 Verificando..
             </div>
-            ) : isOpen ? (
-            <div className="bg-brand-accent/10 text-brand-accent text-xs font-bold px-3 py-1 rounded-full animate-pulse border border-brand-accent/20">
-                Abierto
-            </div>
             ) : (
-            <div className="bg-red-50 text-red-500 text-xs font-bold px-3 py-1 rounded-full border border-red-100">
-                Cerrado
-            </div>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                isOpen
+                    ? 'bg-green-100 text-green-700 animate-pulse'
+                    : 'bg-red-100 text-red-700'
+            }`}>
+                <span className={`w-2 h-2 rounded-full ${
+                    isOpen ? 'bg-green-500' : 'bg-red-500'
+                }`} />
+                {isOpen ? 'Abierto' : 'Cerrado'}
+            </span>
             )}
         </div>
         </header>
