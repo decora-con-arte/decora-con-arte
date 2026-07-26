@@ -18,6 +18,7 @@ export function MenuPage() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [specialMeals, setSpecialMeals] = useState<SpecialMeal[]>([]);
     const [modalImgError, setModalImgError] = useState(false);
+    const [isPortrait, setIsPortrait] = useState(false);
     const [mealImgErrors, setMealImgErrors] = useState<Record<string, boolean>>({});
 
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -71,6 +72,7 @@ export function MenuPage() {
     const handleSelectProduct = useCallback((product: Product) => {
         setSelectedProduct(product);
         setModalImgError(false);
+        setIsPortrait(false);
     }, []);
 
     const scroll = (direction: 'left' | 'right') => {
@@ -330,54 +332,109 @@ export function MenuPage() {
                             <X size={20} strokeWidth={3} />
                         </button>
 
-                        <div className="bg-white rounded-[2rem] overflow-y-auto shadow-2xl max-h-[72vh]">
-                            <div className="w-full bg-[#F2C1C1]/10 relative">
-                                {selectedProduct.image?.startsWith('http') && !modalImgError ? (
-                                    <>
+                        {isPortrait ? (
+                            <div className="bg-white rounded-[2rem] shadow-2xl max-h-[72vh] flex flex-row overflow-hidden">
+                                <div className="w-2/5 bg-[#F2C1C1]/10 overflow-hidden shrink-0">
+                                    {selectedProduct.image?.startsWith('http') && !modalImgError ? (
                                         <img
                                             src={selectedProduct.image}
                                             alt={selectedProduct.name}
-                                            className="w-full block"
+                                            className="w-full h-full object-cover"
+                                            onLoad={(e) => {
+                                                const { naturalWidth, naturalHeight } = e.currentTarget;
+                                                setIsPortrait(naturalHeight > naturalWidth);
+                                            }}
                                             onError={() => setModalImgError(true)}
                                         />
-                                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
-                                    </>
-                                ) : (
-                                    <div className="w-full min-h-[200px] bg-[#F2C1C1]/20 flex items-center justify-center">
-                                        <Utensils size={64} className="text-[#D57479]/30" />
-                                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
-                                    </div>
-                                )}
+                                    ) : (
+                                        <div className="w-full h-full min-h-[200px] bg-[#F2C1C1]/20 flex items-center justify-center">
+                                            <Utensils size={48} className="text-[#D57479]/30" />
+                                        </div>
+                                    )}
+                                </div>
 
-                                <div className="absolute bottom-4 left-4 right-4 text-left">
-                                    <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-white/30">
-                                        {selectedProduct.category}
-                                    </span>
-                                    <h2 className="text-white text-2xl sm:text-3xl font-black mt-1.5 leading-tight drop-shadow-md">
-                                        {selectedProduct.name}
-                                    </h2>
+                                <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                                    <div>
+                                        <span className="bg-[#F2C1C1] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                            {selectedProduct.category}
+                                        </span>
+                                        <h2 className="text-gray-800 text-xl font-black mt-2 leading-tight">
+                                            {selectedProduct.name}
+                                        </h2>
+                                    </div>
+
+                                    <p className="text-gray-600 text-sm font-medium leading-relaxed">
+                                        {selectedProduct.description || "Sin descripción detallada."}
+                                    </p>
+
+                                    {selectedProduct.price !== 1 && (
+                                        <button
+                                            onClick={() => {
+                                                handleAddToCart(selectedProduct);
+                                                setSelectedProduct(null);
+                                            }}
+                                            className="w-full bg-[#D57479] text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-[#F2C1C1]/50 active:scale-[0.98] transition-all shrink-0 hover:bg-[#C4656A]"
+                                        >
+                                            <span className="uppercase tracking-tight text-sm">Añadir al Pedido</span>
+                                            <span className="text-xl font-black">${selectedProduct.price?.toLocaleString()}</span>
+                                        </button>
+                                    )}
                                 </div>
                             </div>
+                        ) : (
+                            <div className="bg-white rounded-[2rem] overflow-y-auto shadow-2xl max-h-[72vh]">
+                                <div className="w-full bg-[#F2C1C1]/10 relative">
+                                    {selectedProduct.image?.startsWith('http') && !modalImgError ? (
+                                        <>
+                                            <img
+                                                src={selectedProduct.image}
+                                                alt={selectedProduct.name}
+                                                className="w-full block"
+                                                onLoad={(e) => {
+                                                    const { naturalWidth, naturalHeight } = e.currentTarget;
+                                                    setIsPortrait(naturalHeight > naturalWidth);
+                                                }}
+                                                onError={() => setModalImgError(true)}
+                                            />
+                                            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
+                                        </>
+                                    ) : (
+                                        <div className="w-full min-h-[200px] bg-[#F2C1C1]/20 flex items-center justify-center">
+                                            <Utensils size={64} className="text-[#D57479]/30" />
+                                            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
+                                        </div>
+                                    )}
 
-                            <div className="p-6 space-y-6">
-                                <p className="text-gray-600 text-sm font-medium leading-relaxed">
-                                    {selectedProduct.description || "Sin descripción detallada."}
-                                </p>
+                                    <div className="absolute bottom-4 left-4 right-4 text-left">
+                                        <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-white/30">
+                                            {selectedProduct.category}
+                                        </span>
+                                        <h2 className="text-white text-2xl sm:text-3xl font-black mt-1.5 leading-tight drop-shadow-md">
+                                            {selectedProduct.name}
+                                        </h2>
+                                    </div>
+                                </div>
 
-                                {selectedProduct.price !== 1 && (
-                                    <button
-                                        onClick={() => {
-                                            handleAddToCart(selectedProduct);
-                                            setSelectedProduct(null);
-                                        }}
-                                        className="w-full bg-[#D57479] text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-[#F2C1C1]/50 active:scale-[0.98] transition-all shrink-0 hover:bg-[#C4656A]"
-                                    >
-                                        <span className="uppercase tracking-tight text-sm">Añadir al Pedido</span>
-                                        <span className="text-xl font-black">${selectedProduct.price?.toLocaleString()}</span>
-                                    </button>
-                                )}
+                                <div className="p-6 space-y-6">
+                                    <p className="text-gray-600 text-sm font-medium leading-relaxed">
+                                        {selectedProduct.description || "Sin descripción detallada."}
+                                    </p>
+
+                                    {selectedProduct.price !== 1 && (
+                                        <button
+                                            onClick={() => {
+                                                handleAddToCart(selectedProduct);
+                                                setSelectedProduct(null);
+                                            }}
+                                            className="w-full bg-[#D57479] text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-[#F2C1C1]/50 active:scale-[0.98] transition-all shrink-0 hover:bg-[#C4656A]"
+                                        >
+                                            <span className="uppercase tracking-tight text-sm">Añadir al Pedido</span>
+                                            <span className="text-xl font-black">${selectedProduct.price?.toLocaleString()}</span>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             )}
