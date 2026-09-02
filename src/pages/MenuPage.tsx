@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { dataService } from '../services/dataService'; 
 import { ProductCard } from '../components/ProductCard';
 import type { Product, Category, SpecialMeal } from '../types/models'; 
-import { ChevronLeft, ChevronRight, X, Utensils } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Utensils, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 
@@ -22,6 +22,7 @@ export function MenuPage() {
     const [mealImgErrors, setMealImgErrors] = useState<Record<string, boolean>>({});
 
     const scrollRef = useRef<HTMLDivElement>(null);
+    const closeModalTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     useEffect(() => {
         async function loadData() {
@@ -53,6 +54,10 @@ export function MenuPage() {
         loadData();
     }, []);
 
+    useEffect(() => () => {
+        if (closeModalTimerRef.current) clearTimeout(closeModalTimerRef.current);
+    }, []);
+
     const handleAddToCart = useCallback((item: Product) => {
         const safeId = item.id;
         const currentQty = items.find(i => i.cartItemId === safeId)?.quantity ?? 0;
@@ -68,6 +73,13 @@ export function MenuPage() {
 
         showToast(`${item.name} — x${newQty} en tu pedido`);
     }, [addToCart, items, showToast]);
+
+    const handleModalAddToCart = useCallback(() => {
+        if (!selectedProduct) return;
+        handleAddToCart(selectedProduct);
+        if (closeModalTimerRef.current) clearTimeout(closeModalTimerRef.current);
+        closeModalTimerRef.current = setTimeout(() => setSelectedProduct(null), 500);
+    }, [handleAddToCart, selectedProduct]);
 
     const handleSelectProduct = useCallback((product: Product) => {
         setSelectedProduct(product);
@@ -147,7 +159,9 @@ export function MenuPage() {
                             ${specialMeals.length >= 3 ? 'md:snap-x md:snap-mandatory' : ''}
                         `}
                     >
-                        {specialMeals.map((meal) => (
+                        {specialMeals.map((meal) => {
+                            const mealInCartQty = items.find(i => i.cartItemId === meal.id)?.quantity ?? 0;
+                            return (
                             <div
                                 key={meal.id}
                                 onClick={() => handleSelectProduct({
@@ -221,7 +235,7 @@ export function MenuPage() {
                                 </div>
 
                                 {meal.price !== 1 && (
-                                    <div className="pr-1">
+                                    <div className="relative pr-1">
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -235,21 +249,30 @@ export function MenuPage() {
                                                     isAvailable: true
                                                 });
                                             }}
+                                            aria-label={`Añadir ${meal.name} al carrito`}
                                             className={`
-                                                rounded-full bg-[#D57479] text-white 
+                                                relative rounded-full bg-[#D57479] text-white 
                                                 flex items-center justify-center font-black 
                                                 shadow-md cursor-pointer active:scale-90 
                                                 transition-all hover:bg-[#C4656A] hover:shadow-lg
-                                                ${specialMeals.length === 1 ? 'w-10 h-10 md:w-12 md:h-12 text-lg' : 'w-8 h-8'}
+                                                ${specialMeals.length === 1 ? 'w-10 h-10 md:w-12 md:h-12' : 'w-9 h-9'}
                                             `}
-                                            aria-label={`Add ${meal.name} to cart`}
                                         >
-                                            +
+                                            <ShoppingCart
+                                                size={specialMeals.length === 1 ? 20 : 17}
+                                                strokeWidth={2.5}
+                                            />
+                                            {mealInCartQty > 0 && (
+                                                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-primary text-white text-[9px] font-black flex items-center justify-center shadow-sm border-2 border-white">
+                                                    {mealInCartQty}
+                                                </span>
+                                            )}
                                         </button>
                                     </div>
                                 )}
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {specialMeals.length > 3 && (
@@ -301,6 +324,15 @@ export function MenuPage() {
                         ? 'Productos' 
                         : categories.find(c => c.id === activeCategory)?.name || activeCategory}
                 </h2>
+
+                {items.length === 0 && filteredProducts.length > 0 && !loading && (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-brand-primary/15 border border-brand-primary/45 text-[11px] font-bold text-[#C4656A] animate-in fade-in duration-500">
+                        <ShoppingCart size={15} strokeWidth={2.75} className="shrink-0" />
+                        <span className="leading-snug">
+                            Toca <span className="font-black underline decoration-2 underline-offset-2">Añadir</span> para incluirlo en tu pedido
+                        </span>
+                    </div>
+                )}
 
                 {loading ? (
                     <div className="text-center py-10 font-bold text-[#D57479]">Cargando productos...</div>
@@ -369,10 +401,7 @@ export function MenuPage() {
 
                                     {selectedProduct.price !== 1 && (
                                         <button
-                                            onClick={() => {
-                                                handleAddToCart(selectedProduct);
-                                                setSelectedProduct(null);
-                                            }}
+                                            onClick={handleModalAddToCart}
                                             className="w-full bg-[#D57479] text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-[#F2C1C1]/50 active:scale-[0.98] transition-all shrink-0 hover:bg-[#C4656A]"
                                         >
                                             <span className="uppercase tracking-tight text-sm">Añadir al Pedido</span>
@@ -422,10 +451,7 @@ export function MenuPage() {
 
                                     {selectedProduct.price !== 1 && (
                                         <button
-                                            onClick={() => {
-                                                handleAddToCart(selectedProduct);
-                                                setSelectedProduct(null);
-                                            }}
+                                            onClick={handleModalAddToCart}
                                             className="w-full bg-[#D57479] text-white p-4 rounded-2xl font-black flex items-center justify-between shadow-lg shadow-[#F2C1C1]/50 active:scale-[0.98] transition-all shrink-0 hover:bg-[#C4656A]"
                                         >
                                             <span className="uppercase tracking-tight text-sm">Añadir al Pedido</span>

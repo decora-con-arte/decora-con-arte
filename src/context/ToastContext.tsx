@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useCart } from './CartContext';
 import { Toast, type ToastVariant } from '../components/Toast';
 
-const TOAST_DURATION_MS = 2800;
+const TOAST_DURATION_MS = 3200;
 
 interface ToastContextType {
   showToast: (message: string, variant?: ToastVariant) => void;

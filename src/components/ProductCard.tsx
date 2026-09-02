@@ -1,9 +1,9 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import { Image as ImageIcon } from 'lucide-react';
+import { Check, Image as ImageIcon, ShoppingCart } from 'lucide-react';
 import type { Product } from '../types/models';
 import { useCart } from '../context/CartContext';
 
-const ADD_HIGHLIGHT_MS = 250;
+const ADD_HIGHLIGHT_MS = 700;
 
 interface ProductCardProps {
   product: Product; 
@@ -72,13 +72,23 @@ export const ProductCard = memo(function ProductCard({ product, onSelect, onAddT
           </span>
           <button 
             onClick={handleAddClick}
-            className={`min-w-[4.5rem] text-xs font-black px-4 py-2 rounded-lg transition-all shadow-sm active:scale-95 ${
-              isAddHighlighted || inCart
-                ? 'bg-brand-primary text-white shadow-md shadow-[#F2C1C1]-200/60'
-                : 'bg-gray-100 text-brand-text active:bg-brand-primary active:text-white hover:bg-brand-primary hover:text-white'
+            aria-label={inCart ? `Añadir otra unidad de ${product.name}` : `Añadir ${product.name} al carrito`}
+            className={`shrink-0 inline-flex items-center gap-1.5 pl-3 pr-3.5 h-9 rounded-xl text-[11px] sm:text-xs font-black uppercase tracking-wide whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer border ${
+              isAddHighlighted
+                ? 'bg-brand-accent text-white border-brand-accent scale-[1.04] shadow-[0_3px_10px_-2px_rgba(16,185,129,0.5)]'
+                : inCart
+                  ? 'bg-[#C4656A] text-white border-[#C4656A] shadow-sm'
+                  : 'bg-[#D57479] text-white border-[#D57479] shadow-[0_3px_10px_-2px_rgba(213,116,121,0.55)] hover:bg-[#C4656A] hover:border-[#C4656A]'
             }`}
           >
-            {inCart ? `×${cartQuantity}` : 'Añadir'}
+            {isAddHighlighted ? (
+              <Check size={15} strokeWidth={3.5} />
+            ) : (
+              <ShoppingCart size={14} strokeWidth={3} />
+            )}
+            <span>
+              {isAddHighlighted ? '¡Listo!' : inCart ? `×${cartQuantity}` : 'Añadir'}
+            </span>
           </button>
         </div>
       </div>

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Check, Minus } from 'lucide-react';
+import { AlertTriangle, Check, X, type LucideIcon } from 'lucide-react';
 
 export type ToastVariant = 'success' | 'remove' | 'warning';
 
-const EXIT_MS = 280;
+const EXIT_MS = 260;
 
 interface ToastProps {
   message: string;
@@ -12,6 +12,54 @@ interface ToastProps {
   elevated?: boolean;
   onClose: () => void;
 }
+
+interface ToastTheme {
+  container: string;
+  shadow: string;
+  iconWrap: string;
+  label: string;
+  progressTrack: string;
+  progressFill: string;
+}
+
+const TOAST_THEME: Record<ToastVariant, ToastTheme> = {
+  success: {
+    container: 'bg-gradient-to-r from-[#0EA271] via-[#10B981] to-[#0EA271]',
+    shadow: 'shadow-[0_18px_45px_-12px_rgba(16,185,129,0.75)]',
+    iconWrap: 'bg-white/25 text-white',
+    label: 'text-white/80',
+    progressTrack: 'bg-white/25',
+    progressFill: 'bg-white',
+  },
+  remove: {
+    container: 'bg-gradient-to-r from-[#DC2626] via-[#EF4444] to-[#DC2626]',
+    shadow: 'shadow-[0_18px_45px_-12px_rgba(239,68,68,0.75)]',
+    iconWrap: 'bg-white/25 text-white',
+    label: 'text-white/80',
+    progressTrack: 'bg-white/25',
+    progressFill: 'bg-white',
+  },
+  warning: {
+    container: 'bg-gradient-to-r from-[#D97706] via-[#F59E0B] to-[#D97706]',
+    shadow: 'shadow-[0_18px_45px_-12px_rgba(245,158,11,0.8)]',
+    iconWrap: 'bg-white/30 text-white',
+    label: 'text-white/90',
+    progressTrack: 'bg-white/30',
+    progressFill: 'bg-white',
+  },
+};
+
+const TOAST_ICON: Record<ToastVariant, LucideIcon> = {
+  success: Check,
+  remove: X,
+  warning: AlertTriangle,
+};
+
+const TOAST_LABEL: Record<ToastVariant, string> = {
+  success: 'Listo',
+  remove: 'Eliminado',
+  warning: 'Atención',
+};
 
 function parseMessage(message: string) {
   const parts = message.split(' — ');
@@ -22,8 +70,9 @@ function parseMessage(message: string) {
 }
 
 export function Toast({ message, variant = 'success', duration, elevated = false, onClose }: ToastProps) {
-  const isRemove = variant === 'remove';
-  const isWarning = variant === 'warning';
+  const theme = TOAST_THEME[variant];
+  const Icon = TOAST_ICON[variant];
+  const label = TOAST_LABEL[variant];
   const { title, detail } = parseMessage(message);
   const [visible, setVisible] = useState(false);
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -47,43 +96,45 @@ export function Toast({ message, variant = 'success', duration, elevated = false
 
   return (
     <div
-      className={`fixed inset-x-0 z-[200] w-full md:max-w-2xl lg:max-w-5xl mx-auto px-4 pointer-events-none transition-all duration-300 ease-out
-        ${elevated ? 'bottom-44' : 'bottom-24'}`}
+      className={`fixed inset-x-0 z-[200] w-full md:max-w-2xl lg:max-w-5xl mx-auto px-4 pointer-events-none
+        ${elevated ? 'bottom-52' : 'bottom-24'}`}
       role="status"
     >
       <button
         type="button"
         onClick={dismiss}
-        className={`relative w-full max-w-md mx-auto flex items-start gap-3 p-3.5 bg-white/95 backdrop-blur-md border border-gray-100 rounded-2xl shadow-lg pointer-events-auto overflow-hidden max-sm:max-h-[35vh] max-sm:overflow-y-auto transition-all duration-300
-          ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}
+        aria-label="Cerrar notificación"
+        className={`relative w-full max-w-md mx-auto flex items-start gap-3 p-3.5 rounded-2xl text-white pointer-events-auto overflow-hidden transition-all duration-300 ease-out cursor-pointer active:scale-[0.98] ${theme.container} ${theme.shadow} ${
+          visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
+        }`}
       >
-        <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl ${isRemove ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-green-500'}`} />
+        <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 ${theme.iconWrap}`}>
+          <Icon size={15} strokeWidth={3} />
+        </span>
 
-        <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5
-          ${isRemove ? 'bg-red-50 text-red-500' : isWarning ? 'bg-amber-50 text-amber-500' : 'bg-green-50 text-green-500'}`}
-        >
-          {isRemove ? <Minus size={14} strokeWidth={3} /> : isWarning ? <span className="text-lg font-black leading-none">!</span> : <Check size={14} strokeWidth={3} />}
-        </div>
-
-        <div className="flex-1 min-w-0 text-left pr-2">
-          <span className={`block text-[10px] font-bold uppercase tracking-wider mb-0.5
-            ${isRemove ? 'text-red-500' : isWarning ? 'text-amber-500' : 'text-green-500'}`}
-          >
-            {isRemove ? 'Eliminado' : isWarning ? 'Atención' : 'Listo'}
+        <span className="flex-1 min-w-0 pr-1 text-left">
+          <span className={`block text-[10px] font-black uppercase tracking-wider mb-0.5 ${theme.label}`}>
+            {label}
           </span>
-          <p className="text-sm font-bold text-brand-text leading-tight m-0">{title}</p>
-          {detail && <p className="text-xs font-medium text-gray-500 mt-1 line-clamp-2 m-0">{detail}</p>}
-        </div>
+          <span className="block text-sm font-black leading-tight">{title}</span>
+          {detail && (
+            <span className={`block text-xs font-semibold mt-1 line-clamp-2 ${theme.label}`}>{detail}</span>
+          )}
+        </span>
 
-        <div className="absolute left-0 right-0 bottom-0 h-1 bg-gray-100">
-          <div
-            className={`h-full origin-left ${isRemove ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-green-500'}`}
-            style={{ 
+        <span aria-hidden="true" className="shrink-0 opacity-60 mt-1">
+          <X size={16} strokeWidth={2.5} />
+        </span>
+
+        <span className={`absolute left-0 right-0 bottom-0 h-1.5 ${theme.progressTrack}`}>
+          <span
+            className={`block h-full origin-left ${theme.progressFill}`}
+            style={{
               animation: `toast-progress ${duration}ms linear forwards`,
               animationPlayState: visible ? 'running' : 'paused'
             }}
           />
-        </div>
+        </span>
       </button>
 
       <style>{`
