@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSupabase } from '../../services/supabaseClient';
+import { withAuthRetry } from '../../services/authService';
 import { HorarioForm } from '../../components/admin/HorarioForm';
 import type { HorarioFormPayload } from '../../components/admin/HorarioForm';
 import { Loader2, ChevronLeft, Clock, Edit3, AlertCircle } from 'lucide-react';
@@ -39,10 +40,12 @@ export function AdminHorarios() {
 
   const fetchHorarios = useCallback(async () => {
     const supabase = getSupabase();
-    const { data, error: err } = await supabase
-      .from('horarios')
-      .select('*')
-      .order('id');
+    const { data, error: err } = await withAuthRetry(() =>
+      supabase
+        .from('horarios')
+        .select('*')
+        .order('id')
+    );
 
     if (err) {
       console.error('Error fetching horarios:', err);
@@ -63,9 +66,11 @@ export function AdminHorarios() {
       const now = new Date().toISOString();
 
       for (const dia of missing) {
-        const { error: insertErr } = await supabase
-          .from('horarios')
-          .insert({ dia, hora_inicio: '09:00', hora_fin: '18:00', abierto: true, created_at: now, updated_at: now });
+        const { error: insertErr } = await withAuthRetry(() =>
+          supabase
+            .from('horarios')
+            .insert({ dia, hora_inicio: '09:00', hora_fin: '18:00', abierto: true, created_at: now, updated_at: now })
+        );
         if (insertErr) console.error(`Error seeding ${dia}:`, insertErr);
       }
 
@@ -103,15 +108,17 @@ export function AdminHorarios() {
 
     try {
       const supabase = getSupabase();
-      const { error: updateErr } = await supabase
-        .from('horarios')
-        .update({
-          hora_inicio: formData.hora_inicio,
-          hora_fin: formData.hora_fin,
-          abierto: formData.abierto,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', editingHorario.id);
+      const { error: updateErr } = await withAuthRetry(() =>
+        supabase
+          .from('horarios')
+          .update({
+            hora_inicio: formData.hora_inicio,
+            hora_fin: formData.hora_fin,
+            abierto: formData.abierto,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingHorario.id)
+      );
 
       if (updateErr) throw updateErr;
 

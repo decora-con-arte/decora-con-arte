@@ -9,6 +9,7 @@ import { AdminPage } from './pages/AdminPage';
 import { AdminProductos } from './pages/admin/AdminProductos';
 import { AdminCategorias } from './pages/admin/AdminCategorias';
 import { AdminHorarios } from './pages/admin/AdminHorarios';
+import { RequireAuth } from './components/RequireAuth';
 
 export function App() {
   return (
@@ -20,10 +21,12 @@ export function App() {
             <Route path="/builder" element={<BuilderPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/admin/productos" element={<AdminProductos />} />
-            <Route path="/admin/categorias" element={<AdminCategorias />} />
-            <Route path="/admin/horarios" element={<AdminHorarios />} />
+            <Route element={<RequireAuth />}>
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/productos" element={<AdminProductos />} />
+              <Route path="/admin/categorias" element={<AdminCategorias />} />
+              <Route path="/admin/horarios" element={<AdminHorarios />} />
+            </Route>
           </Routes>
         </Layout>
       </BrowserRouter>

@@ -1,4 +1,5 @@
 import { getSupabase } from './supabaseClient';
+import { withAuthRetry } from './authService';
 
 const BUCKET = 'products_img';
 
@@ -8,10 +9,12 @@ export const storageService = {
     const ext = file.name.split('.').pop();
     const filePath = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-    const { error } = await supabase.storage.from(BUCKET).upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false,
-    });
+    const { error } = await withAuthRetry(() =>
+      supabase.storage.from(BUCKET).upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      })
+    );
 
     if (error) throw new Error(`Error al subir imagen: ${error.message}`);
 
@@ -25,7 +28,9 @@ export const storageService = {
     const path = imageUrl.replace(baseUrl, '');
     if (!path || path === imageUrl) return;
 
-    const { error } = await supabase.storage.from(BUCKET).remove([path]);
+    const { error } = await withAuthRetry(() =>
+      supabase.storage.from(BUCKET).remove([path])
+    );
     if (error) throw new Error(`Error al eliminar imagen: ${error.message}`);
   },
 };

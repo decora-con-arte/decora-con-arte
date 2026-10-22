@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSupabase } from '../../services/supabaseClient';
+import { withAuthRetry } from '../../services/authService';
 import { CategoryForm } from '../../components/admin/CategoryForm';
 import type { CategoryFormPayload } from '../../components/admin/CategoryForm';
 import { Loader2, ChevronLeft, Plus, Hash, Edit3, Trash2, AlertCircle } from 'lucide-react';
@@ -41,10 +42,12 @@ export function AdminCategorias() {
 
   const fetchCategories = useCallback(async () => {
     const supabase = getSupabase()
-    const { data, error: err } = await supabase
-      .from('categorias')
-      .select('*')
-      .order('id', { ascending: false });
+    const { data, error: err } = await withAuthRetry(() =>
+      supabase
+        .from('categorias')
+        .select('*')
+        .order('id', { ascending: false })
+    );
 
     if (err) {
       console.error('Error fetching categories:', err);
@@ -78,24 +81,28 @@ export function AdminCategorias() {
     try {
       const supabase = getSupabase()
       if (editingCategory) {
-        const { error: updateErr } = await supabase
-          .from('categorias')
-          .update({
-            nombre: formData.nombre,
-            icono: formData.icono || null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingCategory.id);
+        const { error: updateErr } = await withAuthRetry(() =>
+          supabase
+            .from('categorias')
+            .update({
+              nombre: formData.nombre,
+              icono: formData.icono || null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', editingCategory.id)
+        );
 
         if (updateErr) throw updateErr;
       } else {
-        const { error: insertErr } = await supabase
-          .from('categorias')
-          .insert({
-            slug,
-            nombre: formData.nombre,
-            icono: formData.icono || null,
-          });
+        const { error: insertErr } = await withAuthRetry(() =>
+          supabase
+            .from('categorias')
+            .insert({
+              slug,
+              nombre: formData.nombre,
+              icono: formData.icono || null,
+            })
+        );
 
         if (insertErr) throw insertErr;
       }
@@ -123,10 +130,12 @@ export function AdminCategorias() {
       setSaving(true);
       try {
         const supabase = getSupabase()
-        const { error: delErr } = await supabase
-          .from('categorias')
-          .delete()
-          .eq('id', category.id);
+        const { error: delErr } = await withAuthRetry(() =>
+          supabase
+            .from('categorias')
+            .delete()
+            .eq('id', category.id)
+        );
 
         if (delErr) throw delErr;
 

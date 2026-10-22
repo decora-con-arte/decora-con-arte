@@ -1,4 +1,5 @@
 import { getSupabase } from './supabaseClient';
+import { withAuthRetry } from './authService';
 import type { Category, Product, StoreSchedule, SpecialMeal, Ingredient } from '../types/models';
 
 const SPECIALS_LIMIT = Number(import.meta.env.VITE_SPECIALS_LIMIT) || 5;
@@ -28,10 +29,12 @@ export const dataService = {
 
   getProducts: async (): Promise<Product[]> => {
     const supabase = getSupabase()
-    const { data: rows, error } = await supabase
-      .from('productos')
-      .select('slug, nombre, descripcion, precio, img_path, disponibilidad, categorias(slug)')
-      .order('id');
+    const { data: rows, error } = await withAuthRetry(() =>
+      supabase
+        .from('productos')
+        .select('slug, nombre, descripcion, precio, img_path, disponibilidad, categorias(slug)')
+        .order('id')
+    );
 
     if (error) {
       console.error('Error fetching products:', error.message, error.details, error.hint);
@@ -51,10 +54,12 @@ export const dataService = {
 
   getCategories: async (): Promise<Category[]> => {
     const supabase = getSupabase()
-    const { data: rows, error } = await supabase
-      .from('categorias')
-      .select('nombre, icono, slug')
-      .order('id');
+    const { data: rows, error } = await withAuthRetry(() =>
+      supabase
+        .from('categorias')
+        .select('nombre, icono, slug')
+        .order('id')
+    );
 
     if (error) {
       console.error('Error fetching categories:', error);
@@ -79,14 +84,16 @@ export const dataService = {
     const now = new Date().toISOString();
 
     const supabase = getSupabase()
-    const { data: rows, error } = await supabase
-      .from('productos_especiales')
-      .select('*')
-      .eq('activo', true)
-      .or(`fecha_inicio.is.null,fecha_inicio.lte.${now}`)
-      .or(`fecha_fin.is.null,fecha_fin.gte.${now}`)
-      .order('id')
-      .limit(SPECIALS_LIMIT);
+    const { data: rows, error } = await withAuthRetry(() =>
+      supabase
+        .from('productos_especiales')
+        .select('*')
+        .eq('activo', true)
+        .or(`fecha_inicio.is.null,fecha_inicio.lte.${now}`)
+        .or(`fecha_fin.is.null,fecha_fin.gte.${now}`)
+        .order('id')
+        .limit(SPECIALS_LIMIT)
+    );
 
     if (error) {
       console.error('Error fetching special meals:', error);
@@ -107,10 +114,12 @@ export const dataService = {
 
   getSchedule: async (): Promise<StoreSchedule[]> => {
     const supabase = getSupabase()
-    const { data: rows, error } = await supabase
-      .from('horarios')
-      .select('dia, hora_inicio, hora_fin, abierto')
-      .order('id');
+    const { data: rows, error } = await withAuthRetry(() =>
+      supabase
+        .from('horarios')
+        .select('dia, hora_inicio, hora_fin, abierto')
+        .order('id')
+    );
 
     if (error) {
       console.error('Error fetching schedule:', error);
@@ -127,11 +136,13 @@ export const dataService = {
 
   getIngredients: async (): Promise<Ingredient[]> => {
     const supabase = getSupabase()
-    const { data: rows, error } = await supabase
-      .from('ingredientes')
-      .select('nombre, precio_extra, disponible, obligatorio, step_order, max_gratis, categorias(nombre)')
-      .order('step_order')
-      .order('id');
+    const { data: rows, error } = await withAuthRetry(() =>
+      supabase
+        .from('ingredientes')
+        .select('nombre, precio_extra, disponible, obligatorio, step_order, max_gratis, categorias(nombre)')
+        .order('step_order')
+        .order('id')
+    );
 
     if (error) {
       console.error('Error fetching ingredients:', error.message, error.details, error.hint);

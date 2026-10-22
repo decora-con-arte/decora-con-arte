@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSupabase } from '../services/supabaseClient';
+import { ensureFreshSession } from '../services/authService';
 import { Loader2, LogOut, ShieldCheck, Package, Tags, Clock } from 'lucide-react';
 import { AdminCard } from '../components/AdminCard';
 
@@ -11,28 +12,42 @@ export function AdminPage() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    try {
-      const supabase = getSupabase();
+    let active = true;
 
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!session) {
+    ensureFreshSession()
+      .then((result) => {
+        if (!active) return;
+
+        if (!result.session) {
           navigate('/login', { replace: true });
           return;
         }
-        setEmail(session.user.email ?? null);
+
+        setEmail(result.session.user.email ?? null);
         setChecking(false);
+      })
+      .catch(() => {
+        if (active) navigate('/login', { replace: true });
       });
 
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    let subscription: { unsubscribe: () => void } | undefined;
+
+    try {
+      const supabase = getSupabase();
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
           navigate('/login', { replace: true });
         }
       });
-
-      return () => subscription.unsubscribe();
+      subscription = data.subscription;
     } catch {
       navigate('/login', { replace: true });
     }
+
+    return () => {
+      active = false;
+      subscription?.unsubscribe();
+    };
   }, [navigate]);
 
   const handleSignOut = async () => {

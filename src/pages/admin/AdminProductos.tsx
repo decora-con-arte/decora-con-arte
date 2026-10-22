@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSupabase } from '../../services/supabaseClient';
+import { withAuthRetry } from '../../services/authService';
 import { storageService } from '../../services/storageService';
 import { ProductForm } from '../../components/admin/ProductForm';
 import { Loader2, ChevronLeft, Plus, Image as ImageIcon, Edit3, Trash2, AlertCircle } from 'lucide-react';
@@ -62,10 +63,12 @@ export function AdminProductos() {
 
   const fetchProducts = useCallback(async () => {
     const supabase = getSupabase()
-    const { data, error: err } = await supabase
-      .from('productos')
-      .select('*, categorias(nombre)')
-      .order('id', { ascending: false });
+    const { data, error: err } = await withAuthRetry(() =>
+      supabase
+        .from('productos')
+        .select('*, categorias(nombre)')
+        .order('id', { ascending: false })
+    );
 
     if (err) {
       console.error('Error fetching products:', err);
@@ -77,10 +80,12 @@ export function AdminProductos() {
 
   const fetchCategories = useCallback(async () => {
     const supabase = getSupabase()
-    const { data, error: err } = await supabase
-      .from('categorias')
-      .select('id, nombre')
-      .order('id');
+    const { data, error: err } = await withAuthRetry(() =>
+      supabase
+        .from('categorias')
+        .select('id, nombre')
+        .order('id')
+    );
 
     if (!err) setCategories((data ?? []) as CategoryRow[]);
   }, []);
@@ -127,32 +132,36 @@ export function AdminProductos() {
       const categoriaId = formData.categoria_id ? Number(formData.categoria_id) : null;
 
       if (editingProduct) {
-        const { error: updateErr } = await supabase
-          .from('productos')
-          .update({
-            nombre: formData.nombre,
-            descripcion: formData.descripcion || null,
-            precio: formData.precio,
-            categoria_id: categoriaId,
-            img_path: imageUrl || null,
-            disponibilidad: formData.disponibilidad,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingProduct.id);
+        const { error: updateErr } = await withAuthRetry(() =>
+          supabase
+            .from('productos')
+            .update({
+              nombre: formData.nombre,
+              descripcion: formData.descripcion || null,
+              precio: formData.precio,
+              categoria_id: categoriaId,
+              img_path: imageUrl || null,
+              disponibilidad: formData.disponibilidad,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', editingProduct.id)
+        );
 
         if (updateErr) throw updateErr;
       } else {
-        const { error: insertErr } = await supabase
-          .from('productos')
-          .insert({
-            slug,
-            nombre: formData.nombre,
-            descripcion: formData.descripcion || null,
-            precio: formData.precio,
-            categoria_id: categoriaId,
-            img_path: imageUrl || null,
-            disponibilidad: formData.disponibilidad,
-          });
+        const { error: insertErr } = await withAuthRetry(() =>
+          supabase
+            .from('productos')
+            .insert({
+              slug,
+              nombre: formData.nombre,
+              descripcion: formData.descripcion || null,
+              precio: formData.precio,
+              categoria_id: categoriaId,
+              img_path: imageUrl || null,
+              disponibilidad: formData.disponibilidad,
+            })
+        );
 
         if (insertErr) throw insertErr;
       }
@@ -184,10 +193,12 @@ export function AdminProductos() {
           await storageService.remove(product.img_path);
         }
 
-        const { error: delErr } = await supabase
-          .from('productos')
-          .delete()
-          .eq('id', product.id);
+        const { error: delErr } = await withAuthRetry(() =>
+          supabase
+            .from('productos')
+            .delete()
+            .eq('id', product.id)
+        );
 
         if (delErr) throw delErr;
 

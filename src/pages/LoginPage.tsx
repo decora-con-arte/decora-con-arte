@@ -1,44 +1,80 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getSupabase } from '../services/supabaseClient';
+import { ensureFreshSession, isTokenIssuedInFuture } from '../services/authService';
 import { Mail, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState(() => {
+    const state = location.state as { message?: string } | null;
+    if (state?.message) return state.message;
+
+    const reauth = new URLSearchParams(location.search).get('reauth');
+    if (reauth === 'clock-skew') {
+      return 'El servidor de autenticación tiene un desfase de reloj. Vuelve a iniciar sesión.';
+    }
+    if (reauth === 'session') {
+      return 'Tu sesión expiró. Inicia sesión nuevamente.';
+    }
+    return '';
+  });
 
   useEffect(() => {
-    try {
-      const supabase = getSupabase();
+    let active = true;
 
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
+    ensureFreshSession()
+      .then((result) => {
+        if (!active) return;
+
+        if (result.session) {
           navigate('/admin', { replace: true });
           return;
         }
+
+        if (result.reason === 'clock-skew') {
+          setNotice('El servidor de autenticación tiene un desfase de reloj. Vuelve a iniciar sesión.');
+        } else if (result.reason === 'refresh-failed') {
+          setNotice('Tu sesión expiró. Inicia sesión nuevamente.');
+        }
+
         setChecking(false);
+      })
+      .catch(() => {
+        if (active) setChecking(false);
       });
 
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (session) {
+    let subscription: { unsubscribe: () => void } | undefined;
+
+    try {
+      const supabase = getSupabase();
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session && !isTokenIssuedInFuture(session.access_token)) {
           navigate('/admin', { replace: true });
         }
       });
-
-      return () => subscription.unsubscribe();
+      subscription = data.subscription;
     } catch {
-      setChecking(false);
+      console.warn('[auth] No se pudo suscribir a los cambios de sesión');
     }
+
+    return () => {
+      active = false;
+      subscription?.unsubscribe();
+    };
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setNotice('');
 
     const trimmed = email.trim();
     if (!trimmed) {
@@ -95,6 +131,12 @@ export function LoginPage() {
           )}
         </div>
 
+        {notice && !sent && (
+          <div className="mb-4 rounded-2xl border border-brand-danger/20 bg-brand-danger/5 px-4 py-3">
+            <p className="text-xs font-bold text-brand-danger">{notice}</p>
+          </div>
+        )}
+
         {sent ? (
           <div className="text-center space-y-4">
             <div className="bg-brand-accent/10 border border-brand-accent/20 rounded-2xl p-6">
@@ -142,6 +184,7 @@ export function LoginPage() {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     setError('');
+                    setNotice('');
                   }}
                   placeholder="tu@correo.com"
                   autoFocus
