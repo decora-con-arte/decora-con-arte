@@ -2,13 +2,52 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getSupabase } from '../services/supabaseClient';
 import { ensureFreshSession, isTokenIssuedInFuture } from '../services/authService';
-import { Mail, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import {
+  Mail,
+  ArrowRight,
+  CheckCircle2,
+  Loader2,
+  KeyRound,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
+
+type LoginMethod = 'password' | 'magic-link';
+
+function getPasswordErrorMessage(message: string): string {
+  if (/invalid login credentials/i.test(message)) {
+    return 'Correo o contraseña incorrectos.';
+  }
+  if (/email not confirmed/i.test(message)) {
+    return 'Confirma tu correo electrónico antes de iniciar sesión.';
+  }
+  if (/too many requests|rate limit/i.test(message)) {
+    return 'Demasiados intentos. Espera un momento e inténtalo de nuevo.';
+  }
+  if (/invalid email/i.test(message)) {
+    return 'El correo no es válido.';
+  }
+  return 'No se pudo iniciar sesión. Inténtalo de nuevo.';
+}
+
+function getMagicLinkErrorMessage(message: string): string {
+  if (/too many requests|rate limit/i.test(message)) {
+    return 'Se alcanzó el límite de enlaces. Inténtalo más tarde.';
+  }
+  if (/invalid email/i.test(message)) {
+    return 'El correo no es válido.';
+  }
+  return 'No se pudo enviar el enlace. Inténtalo de nuevo.';
+}
 
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [method, setMethod] = useState<LoginMethod>('password');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
   const [sent, setSent] = useState(false);
@@ -71,10 +110,58 @@ export function LoginPage() {
     };
   }, [navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const clearFeedback = () => {
     setError('');
     setNotice('');
+  };
+
+  const switchMethod = (next: LoginMethod) => {
+    setMethod(next);
+    setPassword('');
+    setSent(false);
+    clearFeedback();
+  };
+
+  const handlePasswordSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    clearFeedback();
+
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setError('Ingresa tu correo electrónico');
+      return;
+    }
+    if (!password) {
+      setError('Ingresa tu contraseña');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const supabase = getSupabase();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: trimmed,
+        password,
+      });
+
+      if (signInError) {
+        console.error(signInError);
+        setError(getPasswordErrorMessage(signInError.message));
+        return;
+      }
+
+      navigate('/admin', { replace: true });
+    } catch {
+      setError('Error de configuración. Contacta al administrador.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMagicLinkSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    clearFeedback();
 
     const trimmed = email.trim();
     if (!trimmed) {
@@ -86,7 +173,6 @@ export function LoginPage() {
 
     try {
       const supabase = getSupabase();
-
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email: trimmed,
         options: {
@@ -95,17 +181,50 @@ export function LoginPage() {
       });
 
       if (signInError) {
-        setError('No se pudo enviar el enlace. Intenta de nuevo.');
         console.error(signInError);
+        setError(getMagicLinkErrorMessage(signInError.message));
       } else {
         setSent(true);
       }
     } catch {
       setError('Error de configuración. Contacta al administrador.');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
+
+  const emailInput = (
+    <div>
+      <label
+        htmlFor="email"
+        className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2"
+      >
+        Correo electrónico
+      </label>
+      <div className="relative">
+        <Mail
+          size={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+        />
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(event) => {
+            setEmail(event.target.value);
+            clearFeedback();
+          }}
+          placeholder="tu@correo.com"
+          autoFocus
+          autoComplete="email"
+          className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-gray-200 bg-white
+            text-sm text-brand-text placeholder:text-gray-300
+            focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary
+            transition-shadow duration-200"
+        />
+      </div>
+    </div>
+  );
 
   if (checking) {
     return (
@@ -153,60 +272,101 @@ export function LoginPage() {
               </p>
             </div>
 
-            <button
-              onClick={() => {
-                setSent(false);
-                setEmail('');
-              }}
-              className="text-sm font-bold text-brand-primary hover:underline transition-colors"
-            >
-              Usar otro correo
-            </button>
+            <div className="flex flex-col items-center gap-2">
+              <button
+                onClick={() => {
+                  setSent(false);
+                  setEmail('');
+                }}
+                className="text-sm font-bold text-brand-primary hover:underline transition-colors"
+              >
+                Usar otro correo
+              </button>
+              <button
+                onClick={() => switchMethod('password')}
+                className="text-sm font-bold text-gray-400 hover:text-brand-primary hover:underline transition-colors"
+              >
+                Volver a contraseña
+              </button>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+        ) : method === 'password' ? (
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            {emailInput}
+
             <div>
               <label
-                htmlFor="email"
+                htmlFor="password"
                 className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2"
               >
-                Correo electrónico
+                Contraseña
               </label>
               <div className="relative">
-                <Mail
+                <KeyRound
                   size={18}
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                 />
                 <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setError('');
-                    setNotice('');
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    clearFeedback();
                   }}
-                  placeholder="tu@correo.com"
-                  autoFocus
-                  autoComplete="email"
-                  className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-gray-200 bg-white
+                  placeholder="Tu contraseña"
+                  autoComplete="current-password"
+                  className="w-full pl-11 pr-12 py-3.5 rounded-2xl border border-gray-200 bg-white
                     text-sm text-brand-text placeholder:text-gray-300
                     focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary
                     transition-shadow duration-200"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-gray-400
+                    hover:text-brand-primary hover:bg-gray-100 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-              {error && (
-                <p className="text-xs font-bold text-brand-danger mt-1.5 ml-1">
-                  {error}
-                </p>
-              )}
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-cta"
-            >
+            {error && (
+              <p className="text-xs font-bold text-brand-danger ml-1">{error}</p>
+            )}
+
+            <button type="submit" disabled={loading} className="btn-cta">
+              {loading ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <>
+                  <span>Iniciar sesión</span>
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+
+            <div className="pt-1 text-center">
+              <button
+                type="button"
+                onClick={() => switchMethod('magic-link')}
+                className="text-sm font-bold text-brand-primary hover:underline transition-colors"
+              >
+                Usar enlace mágico
+              </button>
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={handleMagicLinkSubmit} className="space-y-4">
+            {emailInput}
+
+            {error && (
+              <p className="text-xs font-bold text-brand-danger ml-1">{error}</p>
+            )}
+
+            <button type="submit" disabled={loading} className="btn-cta">
               {loading ? (
                 <Loader2 size={18} className="animate-spin" />
               ) : (
@@ -216,6 +376,16 @@ export function LoginPage() {
                 </>
               )}
             </button>
+
+            <div className="pt-1 text-center">
+              <button
+                type="button"
+                onClick={() => switchMethod('password')}
+                className="text-sm font-bold text-gray-400 hover:text-brand-primary hover:underline transition-colors"
+              >
+                Volver a contraseña
+              </button>
+            </div>
           </form>
         )}
       </div>

@@ -3,6 +3,9 @@ import { getSupabase } from './supabaseClient';
 
 const CLOCK_SKEW_TOLERANCE_SECONDS = 300;
 const EXPIRY_BUFFER_SECONDS = 60;
+const MAX_JWT_RETRIES = 2;
+const MAX_SKEW_WAIT_SECONDS = 30;
+const MIN_RETRY_DELAY_MS = 400;
 
 export interface JwtPayload {
   iat?: number;
@@ -85,6 +88,17 @@ function isJwtFutureError(error: unknown): boolean {
   return typeof message === 'string' && /jwt issued at future/i.test(message);
 }
 
+function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function getIatDeltaSeconds(token: string | null | undefined): number | null {
+  const payload = decodeJwtPayload(token);
+  if (typeof payload?.iat !== 'number') return null;
+
+  return payload.iat - Date.now() / 1000;
+}
+
 async function clearLocalSession(): Promise<void> {
   try {
     await getSupabase().auth.signOut({ scope: 'local' });
@@ -116,52 +130,73 @@ function redirectToLogin(reason: 'session' | 'clock-skew'): void {
   window.location.assign(`/login?${params.toString()}`);
 }
 
-type RecoveryResult = 'retry' | 'stop';
-
-async function recoverSession(): Promise<RecoveryResult> {
+async function getJwtRetryDelay(): Promise<number | null> {
   const supabase = getSupabase();
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return 'stop';
+
+  if (!session) {
+    return MIN_RETRY_DELAY_MS * 2;
+  }
 
   logTokenDiagnostics('pgrst303', session.access_token);
+  const currentDelta = getIatDeltaSeconds(session.access_token);
+
+  if (currentDelta !== null && currentDelta > 0 && currentDelta <= MAX_SKEW_WAIT_SECONDS) {
+    return Math.ceil((currentDelta + 1) * 1000);
+  }
 
   const { data, error } = await supabase.auth.refreshSession();
   if (error || !data.session) {
     console.warn('[auth] No se pudo refrescar la sesión', error);
     await clearLocalSession();
     redirectToLogin('session');
-    return 'retry';
+    return null;
   }
 
-  if (isTokenIssuedInFuture(data.session.access_token)) {
+  const refreshedDelta = getIatDeltaSeconds(data.session.access_token);
+  if (refreshedDelta !== null && refreshedDelta > MAX_SKEW_WAIT_SECONDS) {
     logTokenDiagnostics('pgrst303-refresh', data.session.access_token);
     await clearLocalSession();
     redirectToLogin('clock-skew');
-    return 'retry';
+    return null;
   }
 
-  return 'retry';
+  if (refreshedDelta !== null && refreshedDelta > 0) {
+    return Math.ceil((refreshedDelta + 1) * 1000);
+  }
+
+  return MIN_RETRY_DELAY_MS;
 }
 
 export async function withAuthRetry<T>(operation: () => PromiseLike<T>): Promise<T> {
-  try {
-    const result = await operation();
-    const error = (result as { error?: unknown } | null | undefined)?.error;
+  let lastResult: T | undefined;
 
-    if (!isJwtFutureError(error)) return result;
+  for (let attempt = 0; attempt <= MAX_JWT_RETRIES; attempt += 1) {
+    try {
+      const result = await operation();
+      const error = (result as { error?: unknown } | null | undefined)?.error;
 
-    const recovery = await recoverSession();
-    if (recovery === 'stop') return result;
+      if (!isJwtFutureError(error)) return result;
 
-    return await operation();
-  } catch (error) {
-    if (!isJwtFutureError(error)) throw error;
+      lastResult = result;
+      if (attempt === MAX_JWT_RETRIES) return result;
 
-    const recovery = await recoverSession();
-    if (recovery === 'stop') throw error;
+      const delay = await getJwtRetryDelay();
+      if (delay === null) return result;
 
-    return await operation();
+      await sleep(delay);
+    } catch (error) {
+      if (!isJwtFutureError(error)) throw error;
+      if (attempt === MAX_JWT_RETRIES) throw error;
+
+      const delay = await getJwtRetryDelay();
+      if (delay === null) throw error;
+
+      await sleep(delay);
+    }
   }
+
+  return lastResult as T;
 }
 
 export async function ensureFreshSession(): Promise<SessionCheckResult> {
